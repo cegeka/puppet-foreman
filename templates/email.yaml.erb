@@ -6,7 +6,9 @@ production:
   smtp_settings:
     address: <%= scope.lookupvar("::foreman::email_smtp_address") %>
     port: <%= scope.lookupvar("::foreman::email_smtp_port") %>
+<%- if ! scope.lookupvar("::foreman::email_smtp_domain").nil? -%>
     domain: <%= scope.lookupvar("::foreman::email_smtp_domain") %>
+<%- end -%>
     authentication: :<%= scope.lookupvar("::foreman::email_smtp_authentication") %>
   <%- if scope.lookupvar("::foreman::email_smtp_authentication") == 'login' -%>
     user_name: <%= scope.lookupvar("::foreman::email_smtp_user_name") %>
