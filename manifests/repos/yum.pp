@@ -6,6 +6,12 @@ define foreman::repos::yum ($repo, $yumcode, $gpgcheck) {
     'nightly'     => $repo,
     default       => "releases/${repo}",
   }
+  $ror_repo_path = $repo ? {
+    'stable'      => 'rails/latest',
+    /^releases\// => "rails/foreman-${repo}",
+    'nightly'     => 'rails/nightly',
+    default       => "rails/foreman-${repo}",
+  }
   $plugins_repo_path = $repo ? {
     'stable'      => 'plugins/latest',
     /^releases\// => regsubst($repo, '^release/(.*?)', 'plugins/\1'),
@@ -44,5 +50,12 @@ define foreman::repos::yum ($repo, $yumcode, $gpgcheck) {
     baseurl  => "http://yum.theforeman.org/${plugins_repo_path}/${yumcode}/source",
     gpgcheck => '0',
     enabled  => '0',
+  }
+  yumrepo { "$name-ror":
+    descr    => "Foreman RoR ${repo}",
+    baseurl  => "http://yum.theforeman.org/${ror_repo_path}/${yumcode}/\$basearch",
+    gpgcheck => $gpgcheck_enabled,
+    gpgkey   => "https://yum.theforeman.org/${ror_repo_path}/RPM-GPG-KEY-copr",
+    enabled  => '1',
   }
 }
