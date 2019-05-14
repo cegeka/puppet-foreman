@@ -109,6 +109,7 @@ class foreman::config::passenger(
     }
   }
 
+  include ::apache
   include ::apache::mod::headers
   include ::apache::mod::passenger
 
