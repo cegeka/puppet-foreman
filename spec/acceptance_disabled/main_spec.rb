@@ -9,8 +9,8 @@ describe 'puppet::main::settings' do
         include profile::iac::java_jdk
         include profile::iac::java::alternatives
 
-        $scriptura_server               = hiera_hash('profile::iac::scriptura::server',{})
-        $scriptura_additional_packages  = hiera_hash('profile::iac::scriptura::additional_packages',{})
+        $scriptura_server               = lookup({ 'name' => 'profile::iac::scriptura::server', 'default_value' => {} , merge => hash })
+        $scriptura_additional_packages  = lookup({ 'name' =>'profile::iac::scriptura::additional_packages', 'default_value' => {} , merge => hash })
         create_resources('scriptura::iac::server',$scriptura_server)
       EOS
 
