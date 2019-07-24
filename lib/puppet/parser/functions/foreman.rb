@@ -27,6 +27,8 @@
 #                 in case of an given hash foreman() returns an array of hashes selecting only
 #                 attribute keys given in hash renamed to values of given keys. This can be used
 #                 to rename keys in result
+# 'timeout' is the Foreman request timeout in seconds as an integer.
+#           This defaults to five seconds.
 #
 # Then, use a variable to capture its output:
 # $hosts = foreman($f)
@@ -36,6 +38,7 @@
 #
 # Happy Foreman API-ing!
 
+require "yaml"
 require "net/http"
 require "net/https"
 require "uri"
@@ -49,10 +52,12 @@ module Puppet::Parser::Functions
     item          = args_hash["item"]
     search        = args_hash["search"]
     per_page      = args_hash["per_page"]     || "20"
+    use_tfmproxy  = args_hash["use_tfmproxy"] || false
     foreman_url   = args_hash["foreman_url"]  || "https://localhost" # defaults: all-in-one
     foreman_user  = args_hash["foreman_user"] || "admin"             # has foreman/puppet
     foreman_pass  = args_hash["foreman_pass"] || "changeme"          # on the same box
     filter_result = args_hash['filter_result'] || false
+    timeout       = (args_hash['timeout']      || 5).to_i
 
     # extend this as required
     searchable_items = %w{ environments fact_values hosts hostgroups puppetclasses smart_proxies subnets }
@@ -61,17 +66,31 @@ module Puppet::Parser::Functions
 
     begin
       path = URI.escape("/api/#{item}?search=#{search}&per_page=#{per_page}")
-      uri = URI.parse(foreman_url)
 
       req = Net::HTTP::Get.new(path)
-      req.basic_auth(foreman_user, foreman_pass)
       req['Content-Type'] = 'application/json'
       req['Accept'] = 'application/json'
 
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if uri.scheme == 'https'
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if http.use_ssl?
-      results = Timeout::timeout(5) { PSON.parse http.request(req).body }
+      if use_tfmproxy
+        configfile = '/etc/foreman-proxy/settings.yml'
+        configfile = use_tfmproxy if use_tfmproxy.is_a? String
+        raise Puppet::ParseError, "File #{configfile} not found while use_tfmproxy is enabled" unless File.exists?(configfile)
+        tfmproxy = YAML.load(File.read(configfile))
+        uri = URI.parse(tfmproxy[:foreman_url])
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        http.ca_file = tfmproxy[:foreman_ssl_ca]
+        http.cert = OpenSSL::X509::Certificate.new(File.read(tfmproxy[:foreman_ssl_cert]))
+        http.key = OpenSSL::PKey::RSA.new(File.read(tfmproxy[:foreman_ssl_key]), nil)
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      else
+        uri = URI.parse(foreman_url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        req.basic_auth(foreman_user, foreman_pass)
+        http.use_ssl = true if uri.scheme == 'https'
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE if http.use_ssl?
+      end
+      results = Timeout::timeout(timeout) { PSON.parse http.request(req).body }
     rescue Exception => e
       raise Puppet::ParseError, "Failed to contact Foreman at #{foreman_url}: #{e}"
     end
