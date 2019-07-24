@@ -11,9 +11,9 @@ require 'rbconfig'
 require 'yaml'
 
 if RbConfig::CONFIG['host_os'] =~ /freebsd|dragonfly/i
-  $settings_file = '/usr/local/etc/puppet/foreman.yaml'
+  $settings_file ||= '/usr/local/etc/puppet/foreman.yaml'
 else
-  $settings_file = File.exist?('/etc/puppetlabs/puppet/foreman.yaml') ? '/etc/puppetlabs/puppet/foreman.yaml' : '/etc/puppet/foreman.yaml'
+  $settings_file ||= File.exist?('/etc/puppetlabs/puppet/foreman.yaml') ? '/etc/puppetlabs/puppet/foreman.yaml' : '/etc/puppet/foreman.yaml'
 end
 
 SETTINGS = YAML.load_file($settings_file)
@@ -93,11 +93,44 @@ rescue LoadError
   end
 end
 
+def empty_values_hash?(facts_file)
+  facts = File.read(facts_file)
+  puppet_facts = YAML::load(facts.gsub(/\!ruby\/object.*$/,''))
+
+  puppet_facts['values'].empty?
+end
+
+def process_host_facts(certname)
+    f = "#{puppetdir}/yaml/facts/#{certname}.yaml"
+    if File.size(f) != 0
+      if empty_values_hash?(f)
+        puts "Empty values hash in fact file #{f}, not uploading"
+        return 0
+      end
+
+      req = generate_fact_request(certname, f)
+      begin
+        upload_facts(certname, req) if req
+        return 0
+      rescue => e
+        $stderr.puts "During fact upload occured an exception: #{e}"
+        return 1
+      end
+    else
+      $stderr.puts "Fact file #{f} does not contain any fact"
+      return 2
+    end
+end
+
 def process_all_facts(http_requests)
   Dir["#{puppetdir}/yaml/facts/*.yaml"].each do |f|
     certname = File.basename(f, ".yaml")
     # Skip empty host fact yaml files
     if File.size(f) != 0
+      if empty_values_hash?(f)
+        puts "Empty values hash in fact file #{f}, not uploading"
+        next
+      end
       req = generate_fact_request(certname, f)
       if http_requests
         http_requests << [certname, req]
@@ -110,31 +143,53 @@ def process_all_facts(http_requests)
   end
 end
 
+def quote_macs! facts
+  # Adds single quotes to all unquoted mac addresses in the raw yaml fact string
+  # if they might otherwise be interpreted as base60 ints
+  facts.gsub!(/: ([0-5][0-9](:[0-5][0-9]){5})$/,": '\\1'")
+end
+
 def build_body(certname,filename)
   # Strip the Puppet:: ruby objects and keep the plain hash
   facts        = File.read(filename)
+  quote_macs! facts if YAML.load('22:22:22:22:22:22').is_a? Integer
   puppet_facts = YAML::load(facts.gsub(/\!ruby\/object.*$/,''))
   hostname     = puppet_facts['values']['fqdn'] || certname
-  
+
+  # if there is no environment in facts
+  # get it from node file ({puppetdir}/yaml/node/
+  unless puppet_facts['values'].key?('environment') || puppet_facts['values'].key?('agent_specified_environment')
+    node_filename = filename.sub('/facts/', '/node/')
+    if File.exist?(node_filename)
+      node_yaml = File.read(node_filename)
+      node_data = YAML::load(node_yaml.gsub(/\!ruby\/object.*$/,''))
+      if node_data.key?('environment')
+        puppet_facts['values']['environment'] = node_data['environment']
+      end
+    end
+  end
+
   begin
     require 'facter'
     puppet_facts['values']['puppetmaster_fqdn'] = Facter.value(:fqdn).to_s
-  rescue LoadError => e
+  rescue LoadError
     puppet_facts['values']['puppetmaster_fqdn'] = `hostname -f`.strip
   end
-  
+
   # filter any non-printable char from the value, if it is a String
   puppet_facts['values'].each do |key, val|
     if val.is_a? String
       puppet_facts['values'][key] = val.scan(/[[:print:]]/).join
     end
   end
-  
+
   {'facts' => puppet_facts['values'], 'name' => hostname, 'certname' => certname}
 end
 
 def initialize_http(uri)
   res              = Net::HTTP.new(uri.host, uri.port)
+  res.open_timeout = SETTINGS[:timeout]
+  res.read_timeout = SETTINGS[:timeout]
   res.use_ssl      = uri.scheme == 'https'
   if res.use_ssl?
     if SETTINGS[:ssl_ca] && !SETTINGS[:ssl_ca].empty?
@@ -181,41 +236,28 @@ rescue => e
 end
 
 def enc(certname)
-  foreman_url      = "#{url}/node/#{certname}?format=yml"
-  uri              = URI.parse(foreman_url)
-  req              = Net::HTTP::Get.new(uri.request_uri)
-  http             = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl     = uri.scheme == 'https'
-  if http.use_ssl?
-    if SETTINGS[:ssl_ca] && !SETTINGS[:ssl_ca].empty?
-      http.ca_file = SETTINGS[:ssl_ca]
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-    else
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
-    if SETTINGS[:ssl_cert] && !SETTINGS[:ssl_cert].empty? && SETTINGS[:ssl_key] && !SETTINGS[:ssl_key].empty?
-      http.cert = OpenSSL::X509::Certificate.new(File.read(SETTINGS[:ssl_cert]))
-      http.key  = OpenSSL::PKey::RSA.new(File.read(SETTINGS[:ssl_key]), nil)
-    end
-  end
-  res = http.start { |http| http.request(req) }
+  uri = URI.parse("#{url}/node/#{certname}?format=yml")
+  req = Net::HTTP::Get.new(uri.request_uri)
+  initialize_http(uri).start do |http|
+    response = http.request(req)
 
-  raise "Error retrieving node #{certname}: #{res.class}\nCheck Foreman's /var/log/foreman/production.log for more information." unless res.code == "200"
-  res.body
+    unless response.code == "200"
+      raise "Error retrieving node #{certname}: #{response.class}\nCheck Foreman's /var/log/foreman/production.log for more information."
+    end
+    response.body
+  end
 end
 
 def upload_facts(certname, req)
   return nil if req.nil?
   uri = URI.parse("#{url}/api/hosts/facts")
   begin
-    res = initialize_http(uri)
-    res.read_timeout = SETTINGS[:timeout]
-    res.start do |http|
+    initialize_http(uri).start do |http|
       response = http.request(req)
       if response.code.start_with?('2')
         cache("#{certname}-push-facts", "Facts from this host were last pushed to #{uri} at #{Time.now}\n")
       else
-        $stderr.puts "During the fact upload the server responded with: #{response.code} #{response.message}. Error is ignored and the execution continues."
+        $stderr.puts "#{certname}: During the fact upload the server responded with: #{response.code} #{response.message}. Error is ignored and the execution continues."
         $stderr.puts response.body
       end
     end
@@ -324,6 +366,10 @@ if __FILE__ == $0 then
     Process::UID.change_privilege(Etc.getpwnam(puppetuser).uid) unless Etc.getpwuid.name == puppetuser
     # Facter (in thread_count) tries to read from $HOME, which is still /root after the UID change
     ENV['HOME'] = Etc.getpwnam(puppetuser).dir
+    # Change CWD to the determined home directory before continuing to make
+    # sure we don't reside in /root or anywhere else we don't have access
+    # permissions
+    Dir.chdir ENV['HOME']
   rescue
     $stderr.puts "cannot switch to user #{puppetuser}, continuing as '#{Etc.getpwuid.name}'"
   end
@@ -338,14 +384,17 @@ if __FILE__ == $0 then
     end
     if push_facts
       # push all facts files to Foreman and don't act as an ENC
-      process_all_facts(false)
+      if ARGV.empty?
+        process_all_facts(false)
+      else
+        process_host_facts(ARGV[0])
+      end
     elsif push_facts_parallel
       http_fact_requests = Http_Fact_Requests.new
       process_all_facts(http_fact_requests)
       upload_facts_parallel(http_fact_requests)
     else
       certname = ARGV[0] || raise("Must provide certname as an argument")
-
       #
       # query External node
       begin
@@ -362,7 +411,8 @@ if __FILE__ == $0 then
           result = enc(certname)
           cache(certname, result)
         end
-      rescue TimeoutError, SocketError, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, FactUploadError
+      rescue TimeoutError, SocketError, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, FactUploadError => e
+        $stderr.puts "Serving cached ENC: #{e}"
         # Read from cache, we got some sort of an error.
         result = read_cache(certname)
       end

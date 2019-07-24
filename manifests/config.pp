@@ -25,26 +25,45 @@ class foreman::config {
     content => template('foreman/database.yml.erb'),
   }
 
-  if $::foreman::email_delivery_method and !empty($::foreman::email_delivery_method) {
-    file { "/etc/foreman/${foreman::email_conf}":
-      ensure  => file,
-      owner   => 'root',
-      group   => $::foreman::group,
-      mode    => '0640',
-      content => template("foreman/${foreman::email_source}"),
-    }
+  # email.yaml support has been removed in 1.16.
+  file { '/etc/foreman/email.yaml':
+    ensure => absent,
   }
 
-  file { $::foreman::init_config:
-    ensure  => file,
-    content => template("foreman/${foreman::init_config_tmpl}.erb"),
+  if $::foreman::use_foreman_service {
+    systemd::dropin_file { 'installer.conf':
+      unit    => "${::foreman::foreman_service}.service",
+      content => template('foreman/foreman.service-overrides.erb'),
+    }
   }
 
   file { $::foreman::app_root:
     ensure  => directory,
   }
 
+  if $::foreman::db_root_cert and $::foreman::db_type == 'postgresql' {
+    $pg_cert_dir = "${::foreman::app_root}/.postgresql"
+
+    file { $pg_cert_dir:
+      ensure => 'directory',
+      owner  => 'root',
+      group  => $::foreman::group,
+      mode   => '0640',
+    }
+
+    file { "${pg_cert_dir}/root.crt":
+      ensure => file,
+      source => $::foreman::db_root_cert,
+      owner  => 'root',
+      group  => $::foreman::group,
+      mode   => '0640',
+    }
+  }
+
   if $::foreman::manage_user {
+    group { $::foreman::group:
+      ensure => 'present',
+    }
     user { $::foreman::user:
       ensure  => 'present',
       shell   => '/bin/false',
@@ -62,24 +81,17 @@ class foreman::config {
   }
 
   if $::foreman::passenger  {
-    class { '::foreman::config::passenger': } -> anchor { 'foreman::config_end': }
+    contain foreman::config::apache
 
     if $::foreman::ipa_authentication {
-      if !defined('$default_ipa_server') or empty($::default_ipa_server) or !defined('$default_ipa_realm') or empty($::default_ipa_realm) {
+      unless 'ipa' in $facts and 'default_server' in $facts['ipa'] and 'default_realm' in $facts['ipa'] {
         fail("${::hostname}: The system does not seem to be IPA-enrolled")
       }
 
       if $::foreman::selinux or (str2bool($::selinux) and $::foreman::selinux != false) {
-        selboolean { 'allow_httpd_mod_auth_pam':
+        selboolean { ['allow_httpd_mod_auth_pam', 'httpd_dbus_sssd']:
           persistent => true,
           value      => 'on',
-        }
-
-        # Prior to RHEL 6.6, httpd_dbus_sssd is unavailable
-        exec { 'setsebool httpd_dbus_sssd':
-          command => '/usr/sbin/setsebool -P httpd_dbus_sssd on',
-          onlyif  => '/usr/sbin/getsebool httpd_dbus_sssd',
-          unless  => '/usr/sbin/getsebool httpd_dbus_sssd | grep \'on$\'',
         }
       }
 
@@ -102,37 +114,34 @@ class foreman::config {
       exec { 'ipa-getkeytab':
         command => "/bin/echo Get keytab \
           && KRB5CCNAME=KEYRING:session:get-http-service-keytab kinit -k \
-          && KRB5CCNAME=KEYRING:session:get-http-service-keytab /usr/sbin/ipa-getkeytab -s ${::default_ipa_server} -k ${foreman::http_keytab} -p HTTP/${::fqdn} \
+          && KRB5CCNAME=KEYRING:session:get-http-service-keytab /usr/sbin/ipa-getkeytab -s ${facts['ipa']['default_server']} -k ${foreman::http_keytab} -p HTTP/${::fqdn} \
           && kdestroy -c KEYRING:session:get-http-service-keytab",
         creates => $::foreman::http_keytab,
-      } ->
-      file { $::foreman::http_keytab:
+      }
+      -> file { $::foreman::http_keytab:
         ensure => file,
         owner  => apache,
         mode   => '0600',
       }
 
-      ::foreman::config::passenger::fragment { 'intercept_form_submit':
+      foreman::config::apache::fragment { 'intercept_form_submit':
         ssl_content => template('foreman/intercept_form_submit.conf.erb'),
       }
 
-      ::foreman::config::passenger::fragment { 'lookup_identity':
+      foreman::config::apache::fragment { 'lookup_identity':
         ssl_content => template('foreman/lookup_identity.conf.erb'),
       }
 
-      ::foreman::config::passenger::fragment { 'auth_kerb':
+      foreman::config::apache::fragment { 'auth_kerb':
         ssl_content => template('foreman/auth_kerb.conf.erb'),
       }
 
 
       if $::foreman::ipa_manage_sssd {
-        $sssd_services = ensure_value_in_string($::sssd_services, ['ifp'], ', ')
-
-        $sssd_ldap_user_extra_attrs = ensure_value_in_string($::sssd_ldap_user_extra_attrs, ['email:mail', 'lastname:sn', 'firstname:givenname'], ', ')
-
-        $sssd_allowed_uids = ensure_value_in_string($::sssd_allowed_uids, ['apache', 'root'], ', ')
-
-        $sssd_user_attributes = ensure_value_in_string($::sssd_user_attributes, ['+email', '+firstname', '+lastname'], ', ')
+        $sssd_services = join(unique(pick($facts['sssd']['services'], []) + ['ifp']), ', ')
+        $sssd_ldap_user_extra_attrs = join(unique(pick($facts['sssd']['ldap_user_extra_attrs'], []) + ['email:mail', 'lastname:sn', 'firstname:givenname']), ', ')
+        $sssd_allowed_uids = join(unique(pick($facts['sssd']['allowed_uids'], []) + ['apache', 'root']), ', ')
+        $sssd_user_attributes = join(unique(pick($facts['sssd']['user_attributes'], []) + ['+email', '+firstname', '+lastname']), ', ')
 
         augeas { 'sssd-ifp-extra-attributes':
           context => '/files/etc/sssd/sssd.conf',
