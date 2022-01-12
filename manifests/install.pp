@@ -1,63 +1,58 @@
 # Install the needed packages for foreman
 class foreman::install {
 
-  case $::foreman::db_type {
-    'sqlite': {
-      case $::osfamily {
-        'Debian': { $package = 'foreman-sqlite3' }
-        default:  { $package = 'foreman-sqlite' }
-      }
-    }
-    'postgresql': {
-      $package = 'foreman-postgresql'
-    }
-    'mysql': {
-      $package = 'foreman-mysql2'
-    }
-    default: {
-      fail("${::hostname}: unknown database type ${::foreman::db_type}")
-    }
+  package { 'foreman-postgresql':
+    ensure => $foreman::version,
   }
 
-  package { $package:
-    ensure  => $::foreman::version,
-  }
-
-  if $::foreman::selinux or (str2bool($::selinux) and $::foreman::selinux != false) {
+  if $facts['os']['selinux']['enabled'] {
     package { 'foreman-selinux':
-      ensure => $::foreman::version,
+      ensure => $foreman::version,
     }
   }
 
-  if $::foreman::passenger and $::foreman::passenger_ruby_package {
-    package { $::foreman::passenger_ruby_package:
-      ensure  => installed,
-#      require => Class['apache'],
-      before  => Class['apache::service'],
+  # Foreman 2.5 dropped support for Passenger. On EL7 there was a native package built for SCL that should be absent.
+  if $foreman::passenger_ruby_package {
+    package { $foreman::passenger_ruby_package:
+      ensure => absent,
     }
   }
 
-  if $::foreman::use_foreman_service {
-    package { 'foreman-service':
-      ensure => installed,
+  package { 'foreman-service':
+    ensure => $foreman::version,
+  }
+
+  if $foreman::dynflow_manage_services {
+    package { 'foreman-dynflow-sidekiq':
+      ensure => $foreman::version,
     }
   }
 
-  if $::foreman::ipa_authentication and $::foreman::ipa_manage_sssd {
+  if $foreman::ipa_authentication and $foreman::ipa_manage_sssd {
     package { 'sssd-dbus':
       ensure => installed,
     }
   }
 
-  if $::foreman::telemetry_statsd_enabled or $::foreman::telemetry_prometheus_enabled {
+  if $foreman::telemetry_statsd_enabled or $foreman::telemetry_prometheus_enabled {
     package { 'foreman-telemetry':
-      ensure => installed,
+      ensure => $foreman::version,
     }
   }
 
-  if $::foreman::logging_type == 'journald' {
+  if $foreman::logging_type == 'journald' {
     package { 'foreman-journald':
-      ensure => installed,
+      ensure => $foreman::version,
     }
+  }
+
+  if $foreman::rails_cache_store['type'] == 'redis' {
+    package { 'foreman-redis':
+      ensure => $foreman::version,
+    }
+  }
+
+  if $foreman::register_in_foreman {
+    contain foreman::providers
   }
 }

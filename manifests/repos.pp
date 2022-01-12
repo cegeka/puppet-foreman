@@ -1,20 +1,23 @@
-# Set up a repository for foreman
+# @summary Set up a repository for foreman
+# @api private
 define foreman::repos(
+  Stdlib::HTTPUrl $yum_repo_baseurl,
   Variant[Enum['nightly'], Pattern['^\d+\.\d+$']] $repo,
   Boolean $gpgcheck = true,
 ) {
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat', 'Linux': {
-      $yumcode = $::operatingsystem ? {
+      $yumcode = $facts['os']['name'] ? {
         'Amazon' => 'el7',
-        'Fedora' => "f${::operatingsystemmajrelease}",
-        default  => "el${::operatingsystemmajrelease}",
+        'Fedora' => "f${facts['os']['release']['major']}",
+        default  => "el${facts['os']['release']['major']}",
       }
 
       foreman::repos::yum {$name:
         repo     => $repo,
         yumcode  => $yumcode,
         gpgcheck => $gpgcheck,
+        baseurl  => $yum_repo_baseurl,
       }
     }
     'Debian': {
@@ -23,7 +26,7 @@ define foreman::repos(
       }
     }
     default: {
-      fail("${::hostname}: This module does not support osfamily ${::osfamily}")
+      fail("${facts['networking']['hostname']}: This module does not support osfamily ${facts['os']['family']}")
     }
   }
 }

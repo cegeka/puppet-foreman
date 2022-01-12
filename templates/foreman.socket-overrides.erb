@@ -1,0 +1,5 @@
+[Socket]
+ListenStream=
+ListenStream=<%= @listen_socket %>
+SocketUser=<%= scope['apache::user'] %>
+SocketMode=0600

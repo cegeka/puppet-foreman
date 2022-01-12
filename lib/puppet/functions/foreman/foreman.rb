@@ -37,6 +37,7 @@
 #
 # Happy Foreman API-ing!
 
+require "cgi"
 require "yaml"
 require "net/http"
 require "net/https"
@@ -48,7 +49,7 @@ Puppet::Functions.create_function(:'foreman::foreman') do
     required_param 'Enum["environments", "fact_values", "hosts", "hostgroups", "puppetclasses", "smart_proxies", "subnets"]', :item
     required_param 'String', :search
     optional_param 'Variant[Integer[0], Pattern[/\d+/]]', :per_page
-    optional_param 'Stdlib::Httpurl', :foreman_url
+    optional_param 'Stdlib::HTTPUrl', :foreman_url
     optional_param 'String', :foreman_user
     optional_param 'String', :foreman_pass
     optional_param 'Integer[0]', :timeout
@@ -61,7 +62,7 @@ Puppet::Functions.create_function(:'foreman::foreman') do
     raise Puppet::ParseError, "Foreman: Invalid filter_result: #{filter_result}, must not be boolean true" if filter_result == true
 
     begin
-      path = URI.escape("/api/#{item}?search=#{search}&per_page=#{per_page}")
+      path = "/api/#{CGI.escape(item)}?search=#{CGI.escape(search)}&per_page=#{CGI.escape(per_page)}"
 
       req = Net::HTTP::Get.new(path)
       req['Content-Type'] = 'application/json'

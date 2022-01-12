@@ -1,8 +1,9 @@
 # Base provider for other Puppet types managing Foreman resources
 #
-# This provider uses Net::HTTP from Ruby stdlib, JSON (stdlib on 1.9+ or the
-# gem on 1.8) and the oauth gem for auth, so requiring minimal dependencies.
+# This provider uses Net::HTTP from Ruby stdlib, JSON and the oauth gem for
+# auth, so requiring minimal dependencies.
 
+require 'cgi'
 require 'uri'
 
 Puppet::Type.type(:foreman_resource).provide(:rest_v3) do
@@ -54,12 +55,15 @@ Puppet::Type.type(:foreman_resource).provide(:rest_v3) do
     OAuth::AccessToken.new(oauth_consumer)
   end
 
-  def request(method, path, params = {}, data = nil, headers = {})
+  def request_uri(path)
     base_url = resource[:base_url]
     base_url += '/' unless base_url.end_with?('/')
+    URI.join(base_url, path)
+  end
 
-    uri = URI.join(base_url, path)
-    uri.query = params.map { |p,v| "#{URI.escape(p.to_s)}=#{URI.escape(v.to_s)}" }.join('&') unless params.empty?
+  def request(method, path, params = {}, data = nil, headers = {})
+    uri = request_uri(path)
+    uri.query = params.map { |p,v| "#{CGI.escape(p.to_s)}=#{CGI.escape(v.to_s)}" }.join('&') unless params.empty?
 
     headers = {
       'Accept' => 'application/json',
@@ -95,6 +99,22 @@ Puppet::Type.type(:foreman_resource).provide(:rest_v3) do
   end
 
   def error_message(response)
-    JSON.parse(response.body)['error']['full_messages'].join(' ') rescue "unknown error (response #{response.code})"
+    fqdn = URI::parse(resource[:base_url]).host
+
+    explanations = {
+      '400' => "Something is wrong with the data sent to Foreman at #{fqdn}",
+      '401' => "Often this is caused by invalid Oauth credentials sent to Foreman at #{fqdn}",
+      '404' => "The requested resource was not found in Foreman at #{fqdn}",
+      '500' => "Check /var/log/foreman/production.log on #{fqdn} for detailed information",
+      '502' => "The webserver received an invalid response from the backend service. Was Foreman at #{fqdn} unable to handle the request?",
+      '503' => "The webserver was unable to reach the backend service. Is Foreman running at #{fqdn}?",
+      '504' => "The webserver timed out waiting for a response from the backend service. Is Foreman at #{fqdn} under unusually heavy load?"
+    }
+
+    if (explanation = explanations[response.code.to_str])
+      "Response: #{response.code} #{response.message}: #{explanation}"
+    else
+      JSON.parse(response.body)['error']['full_messages'].join(' ') rescue "Response: #{response.code} #{response.message}"
+    end
   end
 end

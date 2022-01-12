@@ -11,9 +11,8 @@ Many Foreman plugins can be installed by adding additional `foreman::plugin::*`
 classes, extra compute resource support via `foreman::compute::*` classes and
 the Hammer CLI can be installed by adding `foreman::cli`.
 
-By default, it configures Foreman to run under Apache and Passenger plus
-with a PostgreSQL database. A standalone service can be configured instead by
-setting `passenger` to false, though this isn't recommended in production.
+By default, it configures Foreman to run as a standalone service fronted by
+Apache as a reverse proxy with a PostgreSQL database.
 
 The web interface is configured to use Puppet's SSL certificates by default, so
 ensure they're present first, reconfigure `server_ssl_*` or disable the `ssl`
@@ -29,15 +28,39 @@ to configure Foreman's Smart Proxy and related services.
 
 ## Database support
 
-This module supports configuration of either SQLite, PostgreSQL or MySQL as the
-database for Foreman. The database type can be changed using the `db_type`
-parameter, or management disabled with `db_manage`.
-
 The default database is PostgreSQL, which will be fully installed and managed
 on the host this module is applied to. Databases will be created with using the
 `en_US.utf8` locale, which means a respective OS locale must be available on
-the database host. If using MySQL, the puppetlabs-mysql module must be added to
-the modulepath, otherwise it's not required.
+the database host. The database management can be disabled with `db_manage`.
+
+## Rails Cache support
+
+Foreman supports different backends as Rails cache. This is handled by this
+module using the parameter `rails_cache_store`. The parameter takes a hash
+containing the type and options specfic to the backend.
+
+The default is the file backend, configured via `{'type' => 'file'}`. To
+setup for redis use a hash similar to `{'type' => 'redis', 'urls' => ['localhost:8479/0'], 'options' => {'compress' => 'true', 'namespace' => 'foreman'}}`
+where `urls` takes an array of redis urls which get prepended with `redis://`
+and `options` using a hash with options from [rails](https://guides.rubyonrails.org/caching_with_rails.html#activesupport-cache-store)
+falling back to `{'compress' => 'true', 'namespace' => 'foreman'}` if no
+option is provided.
+
+An example configuration for activating the redis backend with a local instance
+could look like this:
+
+```puppet
+class { 'foreman':
+  rails_cache_store => {
+    'type' => 'redis',
+    'urls' => ['localhost:8479/0'],
+    'options' => {
+      'compress' => 'true',
+      'namespace' => 'foreman'
+    }
+  }
+}
+```
 
 ## Support policy
 
@@ -51,50 +74,48 @@ previous stable release.
 
 ### Foreman version compatibility notes
 
-Running without passenger is only supported on Foreman 1.22+.
-
-The parameters `locations_enabled`, `organizations_enabled` and `authentication`
-will only have any affect on Foreman 1.20 or older, in newer versions these
-settings have been removed.
-
-**Warning** Users configuring Foreman 1.20 and earlier will need to pay
-particular attention. Some defaults have been flipped, including all user
-authentication.
-
-| Setting                    | module 11.x with 1.20 | module 10.x with 1.20 |
-|----------------------------|-----------------------|-----------------------|
-| `authentication` (`login`) | false                 | true                  |
-| `locations_enabled`        | true                  | false                 |
-| `organizations_enabled `   | true                  | false                 |
-
-For Foreman 1.16 or older, please use the 9.x release series of this module.
-
-## Running without passenger
-
-To use this module without passenger, the `passenger` parameter must be set to
-`false`. This will install the `foreman-service` package and ensure the service
-is running.
-
-This introduces a soft dependency on `camptocamp-systemd`. This feature is only
-available on Foreman 1.22+.
+This module targets Foreman 3.1+.
+The module can be used with Foreman 2.4+ by setting `register_in_foreman => false`.
 
 ## Types and providers
 
 `foreman_config_entry` can be used to manage settings in Foreman's database, as
-seen in _Administer > Settings_. Provides:
-
-* `cli` provider uses `foreman-rake` to change settings (default)
-
-`foreman_hostgroup` can create and manage host group in Foreman's database.
-Providers:
-
-* `rest_v2` provider uses API v2 with apipie-bindings and OAuth (default)
+seen in _Administer > Settings_. The `cli` provider uses `foreman-rake` to change settings.
 
 `foreman_smartproxy` can create and manage registered smart proxies in
-Foreman's database. Providers:
+Foreman's database. The `rest_v3` provider uses the API with Ruby's HTTP library, OAuth and JSON.
 
-* `rest_v3` provider uses API v2 with Ruby HTTP library, OAuth and JSON (default)
-* `rest_v2` provider uses API v2 with apipie-bindings and OAuth
+`foreman_hostgroup` can be used to create and destroy hostgroups. Nested hostgroups are supported
+and hostgroups can be assigned to locations/organizations.
+The type currently doesn't support other properties such as `environment`, `puppet classes` etc.
+
+## Foreman ENC via hiera
+
+There is a function `foreman::enc` to retrieve the ENC data. This returns the
+data as a hash and can be used in Hiera. This requires the URL to use the
+Puppet CA infrastructure:
+
+```yaml
+---
+version: 5
+hierarchy:
+  - name: "Foreman ENC"
+    data_hash: foreman::enc
+    options:
+      url: https://foreman.example.com
+```
+
+It is also possible to use HTTP basic auth by adding a username/password to the
+URL in the form of `https://username:password@foreman.example.com`.
+
+Then within your manifests you can use `lookup`. For example, in
+`manifests/site.pp`:
+
+```puppet
+node default {
+  lookup('classes', {merge => unique}).include
+}
+```
 
 # Contributing
 

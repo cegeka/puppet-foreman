@@ -1,27 +1,35 @@
-# Install an apt repo
+# @summary Install an apt repo
+# @api private
 define foreman::repos::apt (
   Variant[Enum['nightly'], Pattern['^\d+\.\d+$']] $repo,
-  Variant[String, Hash] $key = 'AE0AF310E2EA96B6B6F4BD726F8600B9563278F6',
-  Stdlib::Httpurl $location = 'https://deb.theforeman.org/',
+  String $key = 'AE0AF310E2EA96B6B6F4BD726F8600B9563278F6',
+  Stdlib::HTTPUrl $key_location = 'https://deb.theforeman.org/foreman.asc',
+  Stdlib::HTTPUrl $location = 'https://deb.theforeman.org/',
 ) {
-  include ::apt
+  include apt
 
-  ::apt::source { $name:
+  apt::key { $name:
+    ensure => refreshed,
+    id     => $key,
+    source => $key_location,
+  }
+
+  apt::source { $name:
     repos    => $repo,
     location => $location,
-    key      => $key,
     include  => {
       src => false,
     },
+    require  => Apt::Key['foreman'],
   }
 
-  ::apt::source { "${name}-plugins":
+  apt::source { "${name}-plugins":
     release  => 'plugins',
     repos    => $repo,
     location => $location,
-    key      => $key,
     include  => {
       src => false,
     },
+    require  => Apt::Key['foreman'],
   }
 }

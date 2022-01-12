@@ -1,23 +1,13 @@
 <% @header = ''
    ERB.new(File.read(File.expand_path("_header.erb",File.dirname(file))), nil, nil, "@header").result(binding) -%>
 ---
-<%= @header %>
+<%= @header -%>
 
 :unattended: <%= scope.lookupvar("foreman::unattended") %>
 <% unless [nil, :undefined, :undef].include?(scope.lookupvar("foreman::unattended_url")) -%>
 :unattended_url: <%= scope.lookupvar("foreman::unattended_url") %>
 <% end -%>
-<% unless [nil, :undefined, :undef].include?(scope.lookupvar("foreman::authentication")) -%>
-:login: <%= scope.lookupvar("foreman::authentication") %>
-<% end -%>
 :require_ssl: <%= scope.lookupvar("foreman::ssl") %>
-<% unless [nil, :undefined, :undef].include?(scope.lookupvar("foreman::locations_enabled")) -%>
-:locations_enabled: <%= scope.lookupvar("foreman::locations_enabled") %>
-<% end -%>
-<% unless [nil, :undefined, :undef].include?(scope.lookupvar("foreman::organizations_enabled")) -%>
-:organizations_enabled: <%= scope.lookupvar("foreman::organizations_enabled") %>
-<% end -%>
-:puppetrun: <%= scope.lookupvar("foreman::puppetrun") %>
 
 # The following values are used for providing default settings during db migrate
 :oauth_active: <%= scope.lookupvar("foreman::oauth_active") %>
@@ -27,8 +17,8 @@
 
 # Websockets
 :websockets_encrypt: <%= scope.lookupvar("foreman::websockets_encrypt") %>
-:websockets_ssl_key: <%= scope.lookupvar("foreman::websockets_ssl_key") %>
-:websockets_ssl_cert: <%= scope.lookupvar("foreman::websockets_ssl_cert") %>
+:websockets_ssl_key: <%= @websockets_ssl_key %>
+:websockets_ssl_cert: <%= @websockets_ssl_cert %>
 
 # SSL-settings
 :ssl_certificate: <%= scope.lookupvar("foreman::client_ssl_cert") %>
@@ -51,6 +41,16 @@
 :cors_domains:
 <% scope.lookupvar('foreman::cors_domains').each do |domain| -%>
  - '<%= domain %>'
+<% end -%>
+
+<% end -%>
+<% unless scope.lookupvar('foreman::trusted_proxies').empty? -%>
+# List of trusted IPs / networks. Default: IPv4 and IPV6 localhost addresses.
+# If overwritten, localhost addresses (127.0.0.1/8, ::1) need to be in trusted_proxies IP list.
+# More details: https://api.rubyonrails.org/classes/ActionDispatch/RemoteIp.html
+:trusted_proxies:
+<% scope.lookupvar('foreman::trusted_proxies').each do |proxy| -%>
+ - '<%= proxy %>'
 <% end -%>
 
 <% end -%>
@@ -81,6 +81,40 @@
     :enabled: <%= scope.lookupvar("foreman::telemetry_logger_enabled") %>
     # logging level as in Logger::LEVEL
     :level: '<%= scope.lookupvar("foreman::telemetry_logger_level") %>'
+<% if scope.lookupvar("foreman::email_sendmail_location") || scope.lookupvar("foreman::email_sendmail_arguments") -%>
 
+# Email settings
+<% if scope.lookupvar("foreman::email_sendmail_location") -%>
+:email_sendmail_location: "<%= scope.lookupvar("foreman::email_sendmail_location") %>"
+<% end -%>
+<% if scope.lookupvar("foreman::email_sendmail_arguments") -%>
+:email_sendmail_arguments: "<%= scope.lookupvar("foreman::email_sendmail_arguments") %>"
+<% end -%>
+<% end -%>
+
+<% if scope.lookupvar("foreman::dynflow_manage_services") -%>
 :dynflow:
-  :pool_size: <%= scope.lookupvar("foreman::dynflow_pool_size") %>
+  :redis_url: <%= scope.lookupvar("foreman::config::dynflow_redis_url") %>
+
+<% end -%>
+:rails_cache_store:
+  :type: <%= scope["foreman::rails_cache_store"]["type"] %>
+<% if scope["foreman::rails_cache_store"]["type"] == "redis" -%>
+  :urls:
+<%   if scope["foreman::rails_cache_store"].key?("urls") -%>
+<%     scope["foreman::rails_cache_store"]["urls"].each do |url| -%>
+    - redis://<%= url %>
+<%     end -%>
+<%   else -%>
+    - redis://localhost:8479/0
+<%   end -%>
+  :options:
+<%   if scope["foreman::rails_cache_store"].key?("options") -%>
+<%     scope["foreman::rails_cache_store"]["options"].each do |option,value| -%>
+    :<%= option %>: <%= value %>
+<%     end -%>
+<%   else -%>
+    :compress: true
+    :namespace: foreman
+<%   end -%>
+<% end -%>

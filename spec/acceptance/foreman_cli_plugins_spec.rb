@@ -1,60 +1,82 @@
 require 'spec_helper_acceptance'
 
 describe 'Scenario: install foreman-cli + plugins without foreman' do
-  before(:context) do
-    case fact('osfamily')
-    when 'RedHat'
-      on default, 'yum -y remove foreman* tfm-* && rm -rf /etc/yum.repos.d/foreman*.repo'
-    when 'Debian'
-      on default, 'apt-get purge -y foreman*', { :acceptable_exit_codes => [0, 100] }
-      on default, 'apt-get purge -y ruby-hammer-cli-*', { :acceptable_exit_codes => [0, 100] }
-      on default, 'rm -rf /etc/apt/sources.list.d/foreman*'
+  before(:context) { purge_foreman }
+
+  package_prefix = fact('os.release.major') == '7' ? "tfm-" : ""
+
+  context 'for standard plugins' do
+
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
+        class { 'foreman::cli':
+          foreman_url => 'https://foreman.example.com',
+          username    => 'admin',
+          password    => 'changeme',
+        }
+
+        if $facts['os']['family'] == 'RedHat' {
+          include foreman::cli::ansible
+          include foreman::cli::azure
+        }
+        include foreman::cli::discovery
+        include foreman::cli::remote_execution
+        include foreman::cli::tasks
+        include foreman::cli::templates
+        include foreman::cli::webhooks
+        include foreman::cli::puppet
+        PUPPET
+      end
+    end
+
+    it_behaves_like 'hammer'
+
+    ['discovery', 'remote_execution', 'tasks', 'templates', 'webhooks', 'puppet'].each do |plugin|
+      package_name = case fact('os.family')
+                     when 'RedHat'
+                       "#{package_prefix}rubygem-hammer_cli_foreman_#{plugin}"
+                     when 'Debian'
+                       "ruby-hammer-cli-foreman-#{plugin.tr('_', '-')}"
+                     else
+                       plugin
+                     end
+
+      describe package(package_name) do
+        it { is_expected.to be_installed }
+      end
     end
   end
 
-  let(:pp) do
-    configure = fact('osfamily') == 'RedHat' && fact('operatingsystem') != 'Fedora'
-    <<-EOS
-    class { '::foreman::repo':
-      repo                => 'nightly',
-      gpgcheck            => true,
-      configure_epel_repo => #{configure},
-      configure_scl_repo  => #{configure},
-    } ->
-    class { '::foreman::cli':
-      foreman_url => 'https://foreman.example.com',
-      username    => 'admin',
-      password    => 'changeme',
-    }
+  if fact('os.family') == 'RedHat'
+    context 'for katello' do
+      it_behaves_like 'an idempotent resource' do
+        let(:manifest) do
+          <<-PUPPET
+          yumrepo { 'katello':
+            baseurl  => "http://yum.theforeman.org/katello/nightly/katello/el${facts['os']['release']['major']}/x86_64/",
+            gpgcheck => 0,
+          }
 
-    if $facts['osfamily'] == 'RedHat' {
-      include ::foreman::cli::ansible
-    }
-    include ::foreman::cli::discovery
-    include ::foreman::cli::remote_execution
-    include ::foreman::cli::tasks
-    include ::foreman::cli::templates
-    EOS
-  end
+          class { 'foreman::cli':
+            foreman_url => 'https://foreman.example.com',
+            username    => 'admin',
+            password    => 'changeme',
+          }
 
-  it_behaves_like 'a idempotent resource'
+          include foreman::cli::katello
 
-  ['discovery', 'remote_execution', 'tasks', 'templates'].each do |plugin|
-    package_name = case fact('osfamily')
-                   when 'RedHat'
-                     fact('operatingsystem') == 'Fedora' ? "rubygem-hammer_cli_foreman_#{plugin}" : "tfm-rubygem-hammer_cli_foreman_#{plugin}"
-                   when 'Debian'
-                     "ruby-hammer-cli-foreman-#{plugin.tr('_', '-')}"
-                   else
-                     plugin
-                   end
+          Yumrepo['katello'] -> Class['foreman::cli::katello']
+          PUPPET
+        end
+      end
 
-    describe package(package_name) do
-      it { is_expected.to be_installed }
+      it_behaves_like 'hammer'
+
+      package_name = "#{package_prefix}rubygem-hammer_cli_katello"
+      describe package(package_name) do
+        it { is_expected.to be_installed }
+      end
     end
-  end
-
-  describe command('hammer --version') do
-    its(:stdout) { is_expected.to match(/^hammer/) }
   end
 end

@@ -1,3 +1,320 @@
+## [17.0.0](https://github.com/theforeman/puppet-foreman/tree/17.0.0) (2021-04-26)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/16.1.0...17.0.0)
+
+**Breaking changes:**
+
+- Drop Puppetserver integration [\#933](https://github.com/theforeman/puppet-foreman/pull/933) ([ekohl](https://github.com/ekohl))
+- Remove old email.yaml and cronjob cleanups [\#931](https://github.com/theforeman/puppet-foreman/pull/931) ([ekohl](https://github.com/ekohl))
+- Fixes [\#29780](https://projects.theforeman.org/issues/29780) - Drop Passenger support and target Foreman 2.4+ [\#928](https://github.com/theforeman/puppet-foreman/pull/928) ([ekohl](https://github.com/ekohl))
+- Fixes [\#31964](https://projects.theforeman.org/issues/31964) - Assign equal weight to sidekiq queues [\#927](https://github.com/theforeman/puppet-foreman/pull/927) ([ekohl](https://github.com/ekohl))
+- Fixes [\#29817](https://projects.theforeman.org/issues/29817) - Implement a dynflow worker pool [\#843](https://github.com/theforeman/puppet-foreman/pull/843) ([ekohl](https://github.com/ekohl))
+
+**Implemented enhancements:**
+
+- Enable Ruby 2.7 module for EL8 on Foreman 2.5+ [\#937](https://github.com/theforeman/puppet-foreman/pull/937) ([ehelms](https://github.com/ehelms))
+- Refs [\#32276](https://projects.theforeman.org/issues/32276): Add Katello hammer plugin [\#936](https://github.com/theforeman/puppet-foreman/pull/936) ([ehelms](https://github.com/ehelms))
+- Mark compatible with puppetlabs/postgresql 7.x [\#930](https://github.com/theforeman/puppet-foreman/pull/930) ([ekohl](https://github.com/ekohl))
+- use deb gpg key from our server, not the gpg network [\#924](https://github.com/theforeman/puppet-foreman/pull/924) ([evgeni](https://github.com/evgeni))
+- Fixes [\#32175](https://projects.theforeman.org/issues/32175): Allow toggling task backup when cleaning them up [\#922](https://github.com/theforeman/puppet-foreman/pull/922) ([ehelms](https://github.com/ehelms))
+- Add foreman\_webhooks plugin [\#920](https://github.com/theforeman/puppet-foreman/pull/920) ([adamruzicka](https://github.com/adamruzicka))
+- Add foreman\_puppet plugin [\#917](https://github.com/theforeman/puppet-foreman/pull/917) ([ezr-ondrej](https://github.com/ezr-ondrej))
+
+**Fixed bugs:**
+
+- Fixes [\#32208](https://projects.theforeman.org/issues/32208) - accept trailing slash in Krb auth url [\#926](https://github.com/theforeman/puppet-foreman/pull/926) ([ezr-ondrej](https://github.com/ezr-ondrej))
+
+## [16.1.0](https://github.com/theforeman/puppet-foreman/tree/16.1.0) (2021-01-28)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/16.0.0...16.1.0)
+
+**Implemented enhancements:**
+
+- Fixes [\#31670](https://projects.theforeman.org/issues/31670) - don't timeout when running db:migrate [\#915](https://github.com/theforeman/puppet-foreman/pull/915) ([evgeni](https://github.com/evgeni))
+- Fixes [\#30284](https://projects.theforeman.org/issues/30284) - Improve smartproxy registration failure error messages [\#912](https://github.com/theforeman/puppet-foreman/pull/912) ([wbclark](https://github.com/wbclark))
+- Set the reverse proxy host to the name of the service [\#909](https://github.com/theforeman/puppet-foreman/pull/909) ([ehelms](https://github.com/ehelms))
+- Use apache::mod::auth\_openidc [\#906](https://github.com/theforeman/puppet-foreman/pull/906) ([ekohl](https://github.com/ekohl))
+- CLI: Allow to configure use\_sessions setting [\#905](https://github.com/theforeman/puppet-foreman/pull/905) ([neomilium](https://github.com/neomilium))
+- CLI: make refresh\_cache and request\_timeout params global [\#884](https://github.com/theforeman/puppet-foreman/pull/884) ([neomilium](https://github.com/neomilium))
+- Fixes [\#30803](https://projects.theforeman.org/issues/30803): Bind to socket for Puma and Apache [\#883](https://github.com/theforeman/puppet-foreman/pull/883) ([ehelms](https://github.com/ehelms))
+
+**Fixed bugs:**
+
+- Fix URI.escape deprecation warning [\#911](https://github.com/theforeman/puppet-foreman/pull/911) ([ekohl](https://github.com/ekohl))
+
+**Merged pull requests:**
+
+- Drop Puppet \< 3.7.5 version check [\#907](https://github.com/theforeman/puppet-foreman/pull/907) ([ekohl](https://github.com/ekohl))
+
+## [16.0.0](https://github.com/theforeman/puppet-foreman/tree/16.0.0) (2020-10-30)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/15.1.1...16.0.0)
+
+**Breaking changes:**
+
+- Drop Rackspace compute resource that was dropped in Foreman 2.1 [\#894](https://github.com/theforeman/puppet-foreman/pull/894) ([ehelms](https://github.com/ehelms))
+- fixes [\#29938](https://projects.theforeman.org/issues/29938) - change default logging layout [\#847](https://github.com/theforeman/puppet-foreman/pull/847) ([domitea](https://github.com/domitea))
+
+**Implemented enhancements:**
+
+- Set compute resource version parameter to advanced [\#886](https://github.com/theforeman/puppet-foreman/pull/886) ([ehelms](https://github.com/ehelms))
+- Fixes [\#31215](https://projects.theforeman/org/issues/31215) - Generate DSL docs [\#892](https://github.com/theforeman/puppet-foreman/pull/892) ([ofedoren](https://github.com/ofedoren))
+
+**Fixed bugs:**
+
+- Refs [\#30535](https://projects.theforeman.org/issues/30535) - Correctly unset remote user groups [\#896](https://github.com/theforeman/puppet-foreman/pull/896) ([tbrisker](https://github.com/tbrisker))
+- Drop foreman\_compute that was removed in 1.22 [\#895](https://github.com/theforeman/puppet-foreman/pull/895) ([ehelms](https://github.com/ehelms))
+
+## [15.1.1](https://github.com/theforeman/puppet-foreman/tree/15.1.1) (2020-10-14)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/15.1.0...15.1.1)
+
+**Fixed bugs:**
+
+- Fixes [\#30535](https://projects.theforeman.org/issues/30535) - Set HTTP headers proxy requests [\#872](https://github.com/theforeman/puppet-foreman/pull/872) ([hsahmed](https://github.com/hsahmed))
+- Fixes [\#30789](https://projects.theforeman.org/issues/30789) - Set DB pool size dynamically [\#882](https://github.com/theforeman/puppet-foreman/pull/882) ([ekohl](https://github.com/ekohl))
+
+## [15.1.0](https://github.com/theforeman/puppet-foreman/tree/15.1.0) (2020-08-07)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/15.0.2...15.1.0)
+
+**Implemented enhancements:**
+
+- Fixes [\#30078](https://projects.theforeman.org/issues/30078) - add parameter to accept a hostgroup config hash [\#863](https://github.com/theforeman/puppet-foreman/pull/863) ([apatelKmd](https://github.com/apatelKmd))
+- Fixes [\#29892](https://projects.theforeman.org/issues/29892) - Use server certs for websockets [\#846](https://github.com/theforeman/puppet-foreman/pull/846) ([ekohl](https://github.com/ekohl))
+- Switch to postgresql::postgresql\_password [\#845](https://github.com/theforeman/puppet-foreman/pull/845) ([mmoll](https://github.com/mmoll))
+
+## [15.0.2](https://github.com/theforeman/puppet-foreman/tree/15.0.2) (2020-08-03)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/15.0.1...15.0.2)
+
+**Implemented enhancements:**
+
+- Add foreman\_statistics plugin [\#855](https://github.com/theforeman/puppet-foreman/pull/855) ([ezr-ondrej](https://github.com/ezr-ondrej))
+- add plugin foreman\_column\_view [\#601](https://github.com/theforeman/puppet-foreman/pull/601) ([dgoetz](https://github.com/dgoetz))
+
+**Fixed bugs:**
+
+- Fixes [\#30456](https://projects.theforeman.org/issues/30456) - Fix missing icons on /pub page [\#867](https://github.com/theforeman/puppet-foreman/pull/867) ([adamruzicka](https://github.com/adamruzicka))
+- fix: indent for rails\_cache\_store redis type [\#859](https://github.com/theforeman/puppet-foreman/pull/859) ([ministicraft](https://github.com/ministicraft))
+
+## [15.0.1](https://github.com/theforeman/puppet-foreman/tree/15.0.1) (2020-06-15)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/15.0.0...15.0.1)
+
+**Fixed bugs:**
+
+- Fixes [\#30026](https://projects.theforeman.org/issues/30026) - Ensure Foreman is provisioned before puppetdb [\#852](https://github.com/theforeman/puppet-foreman/pull/852) ([ekohl](https://github.com/ekohl))
+
+## [15.0.0](https://github.com/theforeman/puppet-foreman/tree/15.0.0) (2020-05-15)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/14.0.0...15.0.0)
+
+**Breaking changes:**
+
+- Use modern facts [\#841](https://github.com/theforeman/puppet-foreman/issues/841)
+- Prefix ipa and sssd facts with foreman\_ [\#839](https://github.com/theforeman/puppet-foreman/pull/839) ([ekohl](https://github.com/ekohl))
+- Remove unused parameters from puppetmaster [\#824](https://github.com/theforeman/puppet-foreman/pull/824) ([ekohl](https://github.com/ekohl))
+- Rename inventory\_upload to rh\_cloud [\#821](https://github.com/theforeman/puppet-foreman/pull/821) ([ShimShtein](https://github.com/ShimShtein))
+- Refactor repository handling [\#815](https://github.com/theforeman/puppet-foreman/pull/815) ([ekohl](https://github.com/ekohl))
+- Use plugin\_prefix to determine plugin packages [\#809](https://github.com/theforeman/puppet-foreman/pull/809) ([ekohl](https://github.com/ekohl))
+- Fixes [\#29148](https://projects.theforeman.org/issues/29148) - Use Puma instead of Passenger by default [\#802](https://github.com/theforeman/puppet-foreman/pull/802) ([sthirugn](https://github.com/sthirugn))
+
+**Implemented enhancements:**
+
+- Allow puppet/redis 6.x [\#840](https://github.com/theforeman/puppet-foreman/pull/840) ([ekohl](https://github.com/ekohl))
+- Refs [\#29601](https://projects.theforeman.org/issues/29601): Drop foreman-release-scl in favor of centos-release-scl-rh [\#838](https://github.com/theforeman/puppet-foreman/pull/838) ([ehelms](https://github.com/ehelms))
+- Switch AIO detection to use aio\_agent\_version fact [\#834](https://github.com/theforeman/puppet-foreman/pull/834) ([ekohl](https://github.com/ekohl))
+- Add Leapp plugin [\#833](https://github.com/theforeman/puppet-foreman/pull/833) ([stejskalleos](https://github.com/stejskalleos))
+- Fixes [\#29212](https://projects.theforeman.org/issues/29212) - support el8 [\#828](https://github.com/theforeman/puppet-foreman/pull/828) ([wbclark](https://github.com/wbclark))
+- Only install foreman-release-scl on CentOS EL 7 [\#822](https://github.com/theforeman/puppet-foreman/pull/822) ([ehelms](https://github.com/ehelms))
+- Allow extlib 5.x [\#820](https://github.com/theforeman/puppet-foreman/pull/820) ([mmoll](https://github.com/mmoll))
+- Refs [\#29144](https://projects.theforeman.org/issues/29144) - Use systemd socket activation [\#814](https://github.com/theforeman/puppet-foreman/pull/814) ([ekohl](https://github.com/ekohl))
+- Fixes [\#29255](https://projects.theforeman.org/issues/29255) - Set plugin config file mode to 0640 [\#807](https://github.com/theforeman/puppet-foreman/pull/807) ([ekohl](https://github.com/ekohl))
+- Fixes [\#28955](https://projects.theforeman.org/issues/28955) - Add puma configuration tuning options [\#790](https://github.com/theforeman/puppet-foreman/pull/790) ([sthirugn](https://github.com/sthirugn))
+- Fixes [\#28436](https://projects.theforeman.org/issues/28436) - Add keycloak support [\#779](https://github.com/theforeman/puppet-foreman/pull/779) ([ekohl](https://github.com/ekohl))
+- Add options for rails\_cache\_store [\#762](https://github.com/theforeman/puppet-foreman/pull/762) ([dgoetz](https://github.com/dgoetz))
+
+**Fixed bugs:**
+
+- Ensure Foreman is provisioned before configuring cockpit [\#835](https://github.com/theforeman/puppet-foreman/pull/835) ([ekohl](https://github.com/ekohl))
+- Drop the separate rails repository [\#826](https://github.com/theforeman/puppet-foreman/pull/826) ([ekohl](https://github.com/ekohl))
+- Refs [\#29148](https://projects.theforeman.org/issues/29148): Do not proxy /pulp2 to Puma [\#811](https://github.com/theforeman/puppet-foreman/pull/811) ([ehelms](https://github.com/ehelms))
+- Correct casing on Stdlib::HTTPUrl [\#806](https://github.com/theforeman/puppet-foreman/pull/806) ([ekohl](https://github.com/ekohl))
+- Fixes [\#28739](https://projects.theforeman.org/issues/28739): Fix static asset caching when using Puma [\#788](https://github.com/theforeman/puppet-foreman/pull/788) ([ehelms](https://github.com/ehelms))
+
+**Closed issues:**
+
+- db\_username changes do not work [\#750](https://github.com/theforeman/puppet-foreman/issues/750)
+
+**Merged pull requests:**
+
+- Make camptocamp/systemd a hard dependency [\#825](https://github.com/theforeman/puppet-foreman/pull/825) ([ekohl](https://github.com/ekohl))
+- Make foreman::config::apache standalone [\#800](https://github.com/theforeman/puppet-foreman/pull/800) ([ekohl](https://github.com/ekohl))
+
+## [14.0.0](https://github.com/theforeman/puppet-foreman/tree/14.0.0) (2020-02-12)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/13.1.0...14.0.0)
+
+**Breaking changes:**
+
+- Drop foreman::config::passenger::fragment [\#799](https://github.com/theforeman/puppet-foreman/pull/799) ([ekohl](https://github.com/ekohl))
+- Ensure plugins are installed before the database [\#792](https://github.com/theforeman/puppet-foreman/pull/792) ([ekohl](https://github.com/ekohl))
+- Drop keepalive parameters [\#785](https://github.com/theforeman/puppet-foreman/pull/785) ([ekohl](https://github.com/ekohl))
+- Drop listen\_on\_interface [\#784](https://github.com/theforeman/puppet-foreman/pull/784) ([ekohl](https://github.com/ekohl))
+- Drop the selinux parameter [\#783](https://github.com/theforeman/puppet-foreman/pull/783) ([ekohl](https://github.com/ekohl))
+- Drop multiple database support [\#781](https://github.com/theforeman/puppet-foreman/pull/781) ([ekohl](https://github.com/ekohl))
+- Drop Debian 9 and Ubuntu 16.04, add Debian 10 [\#777](https://github.com/theforeman/puppet-foreman/pull/777) ([mmoll](https://github.com/mmoll))
+- Fixes [\#28067](https://projects.theforeman.org/issues/28067) - dynflow sidekiq services config [\#761](https://github.com/theforeman/puppet-foreman/pull/761) ([ezr-ondrej](https://github.com/ezr-ondrej))
+
+**Implemented enhancements:**
+
+- Run migrations if there are pending migrations [\#778](https://github.com/theforeman/puppet-foreman/pull/778) ([ehelms](https://github.com/ehelms))
+- Fixes [\#26739](https://projects.theforeman.org/issues/26739) - Add admin users locale and timezone setting [\#731](https://github.com/theforeman/puppet-foreman/pull/731) ([sbernhard](https://github.com/sbernhard))
+
+**Fixed bugs:**
+
+- Refs [\#28067](https://projects.theforeman.org/issues/28067): Ensure dynflow worker config exists before service [\#791](https://github.com/theforeman/puppet-foreman/pull/791) ([ehelms](https://github.com/ehelms))
+
+## [13.1.0](https://github.com/theforeman/puppet-foreman/tree/13.1.0) (2019-11-25)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/13.0.1...13.1.0)
+
+**Implemented enhancements:**
+
+- Add Foreman AzureRM cli option [\#772](https://github.com/theforeman/puppet-foreman/pull/772) ([apuntamb](https://github.com/apuntamb))
+- Initial AzureRM support [\#767](https://github.com/theforeman/puppet-foreman/pull/767) ([apuntamb](https://github.com/apuntamb))
+
+**Fixed bugs:**
+
+- Fixes [\#28200](https://projects.theforeman.org/issues/28200) - Change cockpit port from 9999 to 19090 [\#768](https://github.com/theforeman/puppet-foreman/pull/768) ([adamruzicka](https://github.com/adamruzicka))
+
+## [13.0.1](https://github.com/theforeman/puppet-foreman/tree/13.0.1) (2019-10-31)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/13.0.0...13.0.1)
+
+**Fixed bugs:**
+
+- Fixes [\#28146](https://projects.theforeman.org/issues/28146) - Drop double leading slash from cockpit url [\#764](https://github.com/theforeman/puppet-foreman/pull/764) ([adamruzicka](https://github.com/adamruzicka))
+
+## [13.0.0](https://github.com/theforeman/puppet-foreman/tree/13.0.0) (2019-10-24)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/12.2.0...13.0.0)
+
+**Breaking changes:**
+
+- Sunsetting foreman\_cockpit because functionality being integrated in remote execution [\#756](https://github.com/theforeman/puppet-foreman/pull/756) ([dgoetz](https://github.com/dgoetz))
+- Drop compatibility with Foreman 1.20 and older + puppetrun parameter [\#745](https://github.com/theforeman/puppet-foreman/pull/745) ([ekohl](https://github.com/ekohl))
+- Rewrite to support reverse proxy [\#677](https://github.com/theforeman/puppet-foreman/pull/677) ([ekohl](https://github.com/ekohl))
+
+**Implemented enhancements:**
+
+- Fixes [\#27932](https://projects.theforeman.org/issues/27932) - Add REX Cockpit support [\#760](https://github.com/theforeman/puppet-foreman/pull/760) ([ekohl](https://github.com/ekohl))
+- Drop Puppet \< 3.4 compatibility code [\#755](https://github.com/theforeman/puppet-foreman/pull/755) ([ekohl](https://github.com/ekohl))
+- Add supervisory\_authority plugin [\#754](https://github.com/theforeman/puppet-foreman/pull/754) ([laugmanuel](https://github.com/laugmanuel))
+- Rely on Puppet data types to ensure variables content is valid in apache::fragment [\#753](https://github.com/theforeman/puppet-foreman/pull/753) ([neomilium](https://github.com/neomilium))
+- Add support for foreman\_inventory\_upload plugin [\#749](https://github.com/theforeman/puppet-foreman/pull/749) ([ShimShtein](https://github.com/ShimShtein))
+- Implement a foreman::enc function [\#742](https://github.com/theforeman/puppet-foreman/pull/742) ([ekohl](https://github.com/ekohl))
+
+**Fixed bugs:**
+
+- Make SSL parameters optional within foreman::puppetmaster [\#752](https://github.com/theforeman/puppet-foreman/pull/752) ([gcoxmoz](https://github.com/gcoxmoz))
+
+**Merged pull requests:**
+
+- remove references to ruby193-\* packages [\#741](https://github.com/theforeman/puppet-foreman/pull/741) ([evgeni](https://github.com/evgeni))
+
+## [12.2.0](https://github.com/theforeman/puppet-foreman/tree/12.2.0) (2019-06-12)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/12.1.0...12.2.0)
+
+**Implemented enhancements:**
+
+- Use system packages on EL8 [\#734](https://github.com/theforeman/puppet-foreman/pull/734) ([ekohl](https://github.com/ekohl))
+
+**Merged pull requests:**
+
+- allow newer versions of dependencies [\#737](https://github.com/theforeman/puppet-foreman/pull/737) ([mmoll](https://github.com/mmoll))
+- Allow `puppetlabs/stdlib` 6.x [\#732](https://github.com/theforeman/puppet-foreman/pull/732) ([alexjfisher](https://github.com/alexjfisher))
+
+## [12.1.0](https://github.com/theforeman/puppet-foreman/tree/12.1.0) (2019-05-21)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/12.0.0...12.1.0)
+
+**Implemented enhancements:**
+
+- Add hammer plugin for foreman\_kubevirt [\#733](https://github.com/theforeman/puppet-foreman/pull/733) ([shiramax](https://github.com/shiramax))
+- Adding foreman\_kubevirt Plugin [\#730](https://github.com/theforeman/puppet-foreman/pull/730) ([masayag](https://github.com/masayag))
+- allow puppetlabs-apt 7.x and puppetlabs-postgresql 7.x [\#728](https://github.com/theforeman/puppet-foreman/pull/728) ([mmoll](https://github.com/mmoll))
+
+**Fixed bugs:**
+
+- Fixes [\#26695](https://projects.theforeman.org/issues/26695) - remove puppetdb\_dashboard\_address [\#729](https://github.com/theforeman/puppet-foreman/pull/729) ([mmoll](https://github.com/mmoll))
+
+## [12.0.0](https://github.com/theforeman/puppet-foreman/tree/12.0.0) (2019-04-18)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/11.0.1...12.0.0)
+
+**Breaking changes:**
+
+- Drop support for $use\_vhost [\#726](https://github.com/theforeman/puppet-foreman/pull/726) ([ekohl](https://github.com/ekohl))
+- Refactor running with a service to Foreman 1.22 [\#723](https://github.com/theforeman/puppet-foreman/pull/723) ([ekohl](https://github.com/ekohl))
+- drop Puppet 4 [\#719](https://github.com/theforeman/puppet-foreman/pull/719) ([mmoll](https://github.com/mmoll))
+
+**Implemented enhancements:**
+
+- Add Parameters for jobs\_service [\#725](https://github.com/theforeman/puppet-foreman/pull/725) ([cocker-cc](https://github.com/cocker-cc))
+- Refactor f::config::passenger to f::config::apache [\#722](https://github.com/theforeman/puppet-foreman/pull/722) ([ekohl](https://github.com/ekohl))
+- Add certname to error output in external\_node\_v2.rb [\#718](https://github.com/theforeman/puppet-foreman/pull/718) ([antaflos](https://github.com/antaflos))
+- Avoid processing fact yaml files with empty 'values' hash [\#717](https://github.com/theforeman/puppet-foreman/pull/717) ([antaflos](https://github.com/antaflos))
+- Expose options to the http and https vhosts [\#716](https://github.com/theforeman/puppet-foreman/pull/716) ([ekohl](https://github.com/ekohl))
+- add cors domains parameter [\#715](https://github.com/theforeman/puppet-foreman/pull/715) ([timogoebel](https://github.com/timogoebel))
+
+## [11.0.1](https://github.com/theforeman/puppet-foreman/tree/11.0.1) (2019-04-02)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/11.0.0...11.0.1)
+
+**Fixed bugs:**
+
+- Fixup yaml facts prior to parsing in node.rb [\#714](https://github.com/theforeman/puppet-foreman/pull/714) ([alexjfisher](https://github.com/alexjfisher))
+
+**Closed issues:**
+
+- Locations and Organizations get turned on by default in 11.0.0 and authentication off [\#711](https://github.com/theforeman/puppet-foreman/issues/711)
+
+**Merged pull requests:**
+
+- Clarify the defaults switched [\#712](https://github.com/theforeman/puppet-foreman/pull/712) ([ekohl](https://github.com/ekohl))
+
+## [11.0.0](https://github.com/theforeman/puppet-foreman/tree/11.0.0) (2019-01-14)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/10.0.0...11.0.0)
+
+**Breaking changes:**
+
+- Remove default repo management [\#708](https://github.com/theforeman/puppet-foreman/pull/708) ([ekohl](https://github.com/ekohl))
+- Fixes [\#25787](https://projects.theforeman.org/issues/25787) - Make login and taxonomy settings optional [\#707](https://github.com/theforeman/puppet-foreman/pull/707) ([tbrisker](https://github.com/tbrisker))
+- Fixes [\#25170](https://projects.theforeman.org/issues/25170) - Prefix user params with initial\_ [\#701](https://github.com/theforeman/puppet-foreman/pull/701) ([chris1984](https://github.com/chris1984))
+
+**Implemented enhancements:**
+
+- allow puppetlabs-apache 4.x [\#709](https://github.com/theforeman/puppet-foreman/pull/709) ([mmoll](https://github.com/mmoll))
+- Fixes [\#23054](https://projects.theforeman.org/issues/23054) - Refactor class inclusion [\#700](https://github.com/theforeman/puppet-foreman/pull/700) ([ekohl](https://github.com/ekohl))
+- Declare Foreman group explicitly [\#697](https://github.com/theforeman/puppet-foreman/pull/697) ([ehelms](https://github.com/ehelms))
+- Allow single node fact upload [\#692](https://github.com/theforeman/puppet-foreman/pull/692) ([ahmet2mir](https://github.com/ahmet2mir))
+- Clean up acceptance tests + make the apt repo parameters [\#687](https://github.com/theforeman/puppet-foreman/pull/687) ([ekohl](https://github.com/ekohl))
+- Add hammer plugin for foreman\_ansible [\#686](https://github.com/theforeman/puppet-foreman/pull/686) ([xprazak2](https://github.com/xprazak2))
+- Reuse initialize\_http in external\_node\_v2 [\#683](https://github.com/theforeman/puppet-foreman/pull/683) ([ekohl](https://github.com/ekohl))
+- Add Puppet 6 support [\#678](https://github.com/theforeman/puppet-foreman/pull/678) ([ekohl](https://github.com/ekohl))
+- namespace extlib functions [\#675](https://github.com/theforeman/puppet-foreman/pull/675) ([mmoll](https://github.com/mmoll))
+
+**Fixed bugs:**
+
+- fix foreman config location for ssl = false and use\_vhost = false [\#705](https://github.com/theforeman/puppet-foreman/pull/705) ([Dimonyga](https://github.com/Dimonyga))
+- Handle websockets\_encrypt as a boolean [\#702](https://github.com/theforeman/puppet-foreman/pull/702) ([ekohl](https://github.com/ekohl))
+- Fix wrong variable name in enc function [\#694](https://github.com/theforeman/puppet-foreman/pull/694) ([ahmet2mir](https://github.com/ahmet2mir))
+- Trying to fix rescue syntax in ENC script [\#685](https://github.com/theforeman/puppet-foreman/pull/685) ([qingbo](https://github.com/qingbo))
+
 ## [10.0.0](https://github.com/theforeman/puppet-foreman/tree/10.0.0) (2018-10-18)
 
 [Full Changelog](https://github.com/theforeman/puppet-foreman/compare/9.2.0...10.0.0)

@@ -3,17 +3,19 @@ class foreman::providers::params {
   # Dependency packages for different providers supplied in this module
   $oauth = true
 
+  $is_aio = fact('aio_agent_version') =~ String[1]
+
   # OS specific package names
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat': {
-      if $::rubysitedir =~ /\/opt\/puppetlabs\/puppet/ {
+      if $is_aio {
         $oauth_package = 'puppet-agent-oauth'
       } else {
         $oauth_package = 'rubygem-oauth'
       }
     }
     'Debian': {
-      if $::rubysitedir =~ /\/opt\/puppetlabs\/puppet/ {
+      if $is_aio {
         $oauth_package = 'puppet-agent-oauth'
       } else {
         $oauth_package = 'ruby-oauth'
@@ -26,21 +28,21 @@ class foreman::providers::params {
       $oauth_package = 'ruby-oauth'
     }
     'Linux': {
-      case $::operatingsystem {
+      case $facts['os']['name'] {
         'Amazon': {
-          if $::rubysitedir =~ /\/opt\/puppetlabs\/puppet/ {
+          if $is_aio {
             $oauth_package = 'puppet-agent-oauth'
           } else {
             $oauth_package = 'rubygem-oauth'
           }
         }
         default: {
-          fail("${::hostname}: This class does not support operatingsystem ${::operatingsystem}")
+          fail("${facts['networking']['hostname']}: This class does not support operatingsystem ${facts['os']['name']}")
         }
       }
     }
     default: {
-      fail("${::hostname}: This class does not support osfamily ${::osfamily}")
+      fail("${facts['networking']['hostname']}: This class does not support osfamily ${facts['os']['family']}")
     }
   }
 }

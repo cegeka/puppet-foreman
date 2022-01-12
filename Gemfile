@@ -3,41 +3,26 @@
 
 source 'https://rubygems.org'
 
-gem 'puppet', ENV.key?('PUPPET_VERSION') ? "~> #{ENV['PUPPET_VERSION']}" : '>= 5.5'
-
+gem 'puppet', ENV.key?('PUPPET_VERSION') ? "~> #{ENV['PUPPET_VERSION']}" : '>= 5.5', groups: ['development', 'test']
 gem 'rake'
-gem 'rspec', '~> 3.0'
-gem 'rdoc', '~> 5.1.0', {"platforms"=>["ruby_21"]}
-gem 'rspec-puppet', '~> 2.3'
-gem 'rspec-puppet-facts', '>= 1.7'
-gem 'puppetlabs_spec_helper', '>= 2.1.1'
-gem 'puppet-lint', '>= 2'
-gem 'puppet-lint-classes_and_types_beginning_with_digits-check'
-gem 'puppet-lint-empty_string-check'
-gem 'puppet-lint-file_ensure-check'
-gem 'puppet-lint-leading_zero-check'
-gem 'puppet-lint-param-docs', '>= 1.3.0'
-gem 'puppet-lint-spaceship_operator_without_tag-check'
-gem 'puppet-lint-strict_indent-check'
-gem 'puppet-lint-trailing_comma-check'
-gem 'puppet-lint-undef_in_function-check'
-gem 'puppet-lint-unquoted_string-check'
-gem 'puppet-lint-variable_contains_upcase'
-gem 'puppet-lint-version_comparison-check'
-gem 'simplecov'
-gem 'github_changelog_generator', {"git"=>"https://github.com/skywinder/github-changelog-generator", "ref"=>"20ee04ba1234e9e83eb2ffb5056e23d641c7a018", "groups"=>["development"]} if RUBY_VERSION >= '2.2.2'
-gem 'puppet-blacksmith', '>= 4.1.0', {"groups"=>["development"]}
-gem 'beaker', '>= 4.2.0', {"groups"=>["system_tests"]}
-gem 'beaker-docker', {"groups"=>["system_tests"]}
-gem 'beaker-hostgenerator', '>= 1.1.10', {"groups"=>["system_tests"]}
-gem 'beaker-puppet', {"groups"=>["system_tests"]}
-gem 'beaker-rspec', {"groups"=>["system_tests"]}
-gem 'beaker-module_install_helper', {"groups"=>["system_tests"]}
-gem 'beaker-puppet_install_helper', {"groups"=>["system_tests"]}
-gem 'metadata-json-lint'
-gem 'kafo_module_lint'
-gem 'parallel_tests'
+
+gem 'kafo_module_lint', {"groups"=>["test"]}
+gem 'puppet-lint-empty_string-check', {"groups"=>["test"]}
+gem 'puppet-lint-file_ensure-check', {"groups"=>["test"]}
+gem 'puppet-lint-param-docs', '>= 1.3.0', {"groups"=>["test"]}
+gem 'puppet-lint-spaceship_operator_without_tag-check', {"groups"=>["test"]}
+gem 'puppet-lint-strict_indent-check', {"groups"=>["test"]}
+gem 'puppet-lint-undef_in_function-check', {"groups"=>["test"]}
+gem 'voxpupuli-test', '~> 1.4', {"groups"=>["test"]}
+gem 'github_changelog_generator', '>= 1.15.0', {"groups"=>["development"]}
+gem 'puppet_metadata', '~> 0.3'
+gem 'puppet-blacksmith', '>= 6.0.0', {"groups"=>["development"]}
+gem 'voxpupuli-acceptance', '~> 1.0', {"groups"=>["system_tests"]}
+gem 'puppetlabs_spec_helper', {"groups"=>["system_tests"]}
 gem 'webmock', '~> 2.0'
 gem 'oauth'
+
+# Pin rdoc to prevent updating bundled psych (https://github.com/ruby/rdoc/commit/ebe185c8775b2afe844eb3da6fa78adaa79e29a4)
+gem 'rdoc', '< 6.4'
 
 # vim:ft=ruby

@@ -6,17 +6,17 @@
 # @param ssl_content
 #   Content of the ssl virtual host fragment
 define foreman::config::apache::fragment(
-  $content=undef,
-  $ssl_content=undef,
+  Optional[String[1]] $content = undef,
+  Optional[String[1]] $ssl_content = undef,
 ) {
-  require ::foreman::config::apache
+  require foreman::config::apache
 
   $_priority = $foreman::config::apache::priority
 
   $http_path = "${::apache::confd_dir}/${_priority}-foreman.d/${name}.conf"
   $https_path = "${::apache::confd_dir}/${_priority}-foreman-ssl.d/${name}.conf"
 
-  if $content and $content != '' {
+  if $content {
     file { $http_path:
       ensure  => file,
       content => $content,
@@ -30,7 +30,7 @@ define foreman::config::apache::fragment(
     }
   }
 
-  if $ssl_content and $ssl_content != '' and $::foreman::config::apache::ssl {
+  if $ssl_content and $foreman::config::apache::ssl {
     file { $https_path:
       ensure  => file,
       content => $ssl_content,
