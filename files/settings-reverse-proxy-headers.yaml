@@ -1,4 +1,4 @@
-
+---
 # Configure reverse proxy headers
 :ssl_client_dn_env: HTTP_SSL_CLIENT_S_DN
 :ssl_client_verify_env: HTTP_SSL_CLIENT_VERIFY
