@@ -1,5 +1,314 @@
 # Changelog
 
+## [25.0.0](https://github.com/theforeman/puppet-foreman/tree/25.0.0) (2024-05-16)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/24.2.0...25.0.0)
+
+**Breaking changes:**
+
+- Fixes [\#33974](https://projects.theforeman.org/issues/33974) - Change the pool size to threads + 4 [\#1161](https://github.com/theforeman/puppet-foreman/pull/1161) ([ShimShtein](https://github.com/ShimShtein))
+- Refs [\#37296](https://projects.theforeman.org/issues/37296) - Drop foreman-hooks [\#1159](https://github.com/theforeman/puppet-foreman/pull/1159) ([adamruzicka](https://github.com/adamruzicka))
+- Refs [\#37212](https://projects.theforeman.org/issues/37212) - Drop foreman\_setup plugin support [\#1155](https://github.com/theforeman/puppet-foreman/pull/1155) ([ekohl](https://github.com/ekohl))
+
+**Implemented enhancements:**
+
+- Allow puppet/redis 11.x [\#1163](https://github.com/theforeman/puppet-foreman/pull/1163) ([evgeni](https://github.com/evgeni))
+- Allow puppet/systemd 7.x [\#1162](https://github.com/theforeman/puppet-foreman/pull/1162) ([gcoxmoz](https://github.com/gcoxmoz))
+- Fixes [\#35832](https://projects.theforeman.org/issues/35832) - set default\_domain\_suffix in sssd.conf [\#1160](https://github.com/theforeman/puppet-foreman/pull/1160) ([adamruzicka](https://github.com/adamruzicka))
+- Add support for Debian 12 [\#1158](https://github.com/theforeman/puppet-foreman/pull/1158) ([evgeni](https://github.com/evgeni))
+- Allow puppetlabs/apache 12.x [\#1157](https://github.com/theforeman/puppet-foreman/pull/1157) ([evgeni](https://github.com/evgeni))
+- Add support for Ubuntu 22.04 [\#1156](https://github.com/theforeman/puppet-foreman/pull/1156) ([evgeni](https://github.com/evgeni))
+
+**Fixed bugs:**
+
+- Fixes [\#37211](https://projects.theforeman.org/issues/37211) - Add ProxyPass for /images to support avatars [\#1154](https://github.com/theforeman/puppet-foreman/pull/1154) ([dgoetz](https://github.com/dgoetz))
+
+## [24.2.0](https://github.com/theforeman/puppet-foreman/tree/24.2.0) (2024-02-19)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/24.1.0...24.2.0)
+
+**Implemented enhancements:**
+
+- Mark compatible with puppet/redis 10.x [\#1153](https://github.com/theforeman/puppet-foreman/pull/1153) ([ekohl](https://github.com/ekohl))
+- Support EL9 [\#1152](https://github.com/theforeman/puppet-foreman/pull/1152) ([ekohl](https://github.com/ekohl))
+- Add hiera data manager \(HDM\) plugin [\#1149](https://github.com/theforeman/puppet-foreman/pull/1149) ([tuxmea](https://github.com/tuxmea))
+- Only install dnf module on EL8 [\#1147](https://github.com/theforeman/puppet-foreman/pull/1147) ([ekohl](https://github.com/ekohl))
+
+## [24.1.0](https://github.com/theforeman/puppet-foreman/tree/24.1.0) (2023-11-29)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/24.0.0...24.1.0)
+
+**Implemented enhancements:**
+
+- Add hammer-cli-foreman-rh-cloud package [\#1145](https://github.com/theforeman/puppet-foreman/pull/1145) ([ShimShtein](https://github.com/ShimShtein))
+
+## [24.0.0](https://github.com/theforeman/puppet-foreman/tree/24.0.0) (2023-11-14)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/23.2.0...24.0.0)
+
+**Breaking changes:**
+
+- Drop deprecated non-namespaced functions [\#1141](https://github.com/theforeman/puppet-foreman/pull/1141) ([ekohl](https://github.com/ekohl))
+- Fixes [\#36801](https://projects.theforeman.org/issues/36801): Make Redis the default cache type [\#1134](https://github.com/theforeman/puppet-foreman/pull/1134) ([ehelms](https://github.com/ehelms))
+- require puppetlabs/stdlib 9.x  [\#1125](https://github.com/theforeman/puppet-foreman/pull/1125) ([bastelfreak](https://github.com/bastelfreak))
+
+**Implemented enhancements:**
+
+- Mark compatible with puppetlabs/postgresql 10.x [\#1143](https://github.com/theforeman/puppet-foreman/pull/1143) ([ekohl](https://github.com/ekohl))
+- Use JSON to parse Foreman API responses [\#1142](https://github.com/theforeman/puppet-foreman/pull/1142) ([ekohl](https://github.com/ekohl))
+- Include settings header via concat [\#1140](https://github.com/theforeman/puppet-foreman/pull/1140) ([ekohl](https://github.com/ekohl))
+- Add Puppet 8 support [\#1139](https://github.com/theforeman/puppet-foreman/pull/1139) ([ekohl](https://github.com/ekohl))
+- Mark compatible with puppet-extlib 7.x [\#1138](https://github.com/theforeman/puppet-foreman/pull/1138) ([ekohl](https://github.com/ekohl))
+- Fixes [\#36090](https://projects.theforeman.org/issues/36090) - Support REX cockpit removal [\#1111](https://github.com/theforeman/puppet-foreman/pull/1111) ([ekohl](https://github.com/ekohl))
+
+## [23.2.0](https://github.com/theforeman/puppet-foreman/tree/23.2.0) (2023-10-10)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/23.1.0...23.2.0)
+
+**Implemented enhancements:**
+
+- Fixes [\#36812](https://projects.theforeman.org/issues/36812) - allow setting \(fc\)ct\_location [\#1135](https://github.com/theforeman/puppet-foreman/pull/1135) ([evgeni](https://github.com/evgeni))
+- Mark compatible with puppetlabs/apache 11.x [\#1131](https://github.com/theforeman/puppet-foreman/pull/1131) ([ekohl](https://github.com/ekohl))
+- Allow puppet/systemd 5.x and 6.x [\#1129](https://github.com/theforeman/puppet-foreman/pull/1129) ([evgeni](https://github.com/evgeni))
+
+**Fixed bugs:**
+
+- correct sendmail configuration [\#1130](https://github.com/theforeman/puppet-foreman/pull/1130) ([evgeni](https://github.com/evgeni))
+
+## [23.1.0](https://github.com/theforeman/puppet-foreman/tree/23.1.0) (2023-08-16)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/23.0.0...23.1.0)
+
+**Implemented enhancements:**
+
+- Fixes [\#36582](https://projects.theforeman.org/issues/36582) - Detect logging layout based on type [\#1124](https://github.com/theforeman/puppet-foreman/pull/1124) ([ekohl](https://github.com/ekohl))
+- Fixes [\#36645](https://projects.theforeman.org/issues/36645) - Change the default Redis cache DB to 4 [\#1122](https://github.com/theforeman/puppet-foreman/pull/1122) ([ekohl](https://github.com/ekohl))
+- allow puppet/redis 9.x [\#1121](https://github.com/theforeman/puppet-foreman/pull/1121) ([evgeni](https://github.com/evgeni))
+
+## [23.0.0](https://github.com/theforeman/puppet-foreman/tree/23.0.0) (2023-05-16)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/22.2.0...23.0.0)
+
+**Breaking changes:**
+
+- Sunsetting foreman\_column\_view because functionality being integrated in Foreman itself [\#1119](https://github.com/theforeman/puppet-foreman/pull/1119) ([dgoetz](https://github.com/dgoetz))
+- Refs [\#36345](https://projects.theforeman.org/issues/36345) - Raise minimum Puppet version to 7.0.0 [\#1118](https://github.com/theforeman/puppet-foreman/pull/1118) ([ekohl](https://github.com/ekohl))
+- drop memcache plugin support [\#1114](https://github.com/theforeman/puppet-foreman/pull/1114) ([evgeni](https://github.com/evgeni))
+- Remove Docker, Spacewalk & DigitalOcean plugins [\#1097](https://github.com/theforeman/puppet-foreman/pull/1097) ([ekohl](https://github.com/ekohl))
+
+**Implemented enhancements:**
+
+- Mark compatible with puppetlabs/concat 8.x & puppetlabs/apache 10.x & puppetlabs/postgresql 9.x [\#1117](https://github.com/theforeman/puppet-foreman/pull/1117) ([ekohl](https://github.com/ekohl))
+- Refs [\#36319](https://projects.theforeman.org/issues/36319) - Add fog\_proxmox plugin support [\#1115](https://github.com/theforeman/puppet-foreman/pull/1115) ([maximiliankolb](https://github.com/maximiliankolb))
+- Bump puppetlabs/apache to \< 10.0.0 [\#1110](https://github.com/theforeman/puppet-foreman/pull/1110) ([gcoxmoz](https://github.com/gcoxmoz))
+
+## [22.2.0](https://github.com/theforeman/puppet-foreman/tree/22.2.0) (2023-02-21)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/22.1.2...22.2.0)
+
+**Implemented enhancements:**
+
+- Fixes [\#36037](https://projects.theforeman.org/issues/36037) - Manage Redis service for Redis cache [\#1109](https://github.com/theforeman/puppet-foreman/pull/1109) ([ekohl](https://github.com/ekohl))
+- Add basic external auth for API [\#1108](https://github.com/theforeman/puppet-foreman/pull/1108) ([ofedoren](https://github.com/ofedoren))
+- bump puppet/systemd to \< 5.0.0 [\#1104](https://github.com/theforeman/puppet-foreman/pull/1104) ([jhoblitt](https://github.com/jhoblitt))
+
+## [22.1.2](https://github.com/theforeman/puppet-foreman/tree/22.1.2) (2023-02-01)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/22.1.1...22.1.2)
+
+**Fixed bugs:**
+
+- Fixes [\#36028](https://projects.theforeman.org/issues/36028) - ensure compressed assets are returned if available [\#1106](https://github.com/theforeman/puppet-foreman/pull/1106) ([evgeni](https://github.com/evgeni))
+
+## [22.1.1](https://github.com/theforeman/puppet-foreman/tree/22.1.1) (2023-01-26)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/22.1.0...22.1.1)
+
+**Fixed bugs:**
+
+- Fixes [\#35870](https://projects.theforeman.org/issues/35870) - Ensure mod\_expires is loaded [\#1101](https://github.com/theforeman/puppet-foreman/pull/1101) ([ekohl](https://github.com/ekohl))
+
+## [22.1.0](https://github.com/theforeman/puppet-foreman/tree/22.1.0) (2022-12-14)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/22.0.0...22.1.0)
+
+**Implemented enhancements:**
+
+- Refs [\#35800](https://projects.theforeman.org/issues/35800) - Add foreman\_kernel\_care plugin support [\#1099](https://github.com/theforeman/puppet-foreman/pull/1099) ([ekohl](https://github.com/ekohl))
+
+## [22.0.0](https://github.com/theforeman/puppet-foreman/tree/22.0.0) (2022-11-03)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/21.2.0...22.0.0)
+
+**Breaking changes:**
+
+- drop abrt and chef plugins [\#1094](https://github.com/theforeman/puppet-foreman/pull/1094) ([evgeni](https://github.com/evgeni))
+- drop support for host\_reports, the plugin was dropped [\#1081](https://github.com/theforeman/puppet-foreman/pull/1081) ([evgeni](https://github.com/evgeni))
+- Drop /pulp2 and /streamer from no\_proxy\_uris [\#1080](https://github.com/theforeman/puppet-foreman/pull/1080) ([evgeni](https://github.com/evgeni))
+- Fixes [\#33956](https://projects.theforeman.org/issues/33956) - serve static assets directly via Apache [\#1078](https://github.com/theforeman/puppet-foreman/pull/1078) ([evgeni](https://github.com/evgeni))
+
+**Implemented enhancements:**
+
+- Refs [\#35414](https://projects.theforeman.org/issues/35414) - Expect a different message in journal [\#1096](https://github.com/theforeman/puppet-foreman/pull/1096) ([ekohl](https://github.com/ekohl))
+- Fixes [\#35685](https://projects.theforeman.org/issues/35685) - allow setting GssapiLocalName to Off [\#1093](https://github.com/theforeman/puppet-foreman/pull/1093) ([evgeni](https://github.com/evgeni))
+- Refs [\#35675](https://projects.theforeman.org/issues/35675) - Add hammer-cli-foreman-google plugin [\#1090](https://github.com/theforeman/puppet-foreman/pull/1090) ([ofedoren](https://github.com/ofedoren))
+- Allow sensitive type for plugin configuration [\#1088](https://github.com/theforeman/puppet-foreman/pull/1088) ([kobybr](https://github.com/kobybr))
+- Fixes [\#35524](https://projects.theforeman.org/issues/35524) - Require puppetlabs-apache 8.x [\#1086](https://github.com/theforeman/puppet-foreman/pull/1086) ([ekohl](https://github.com/ekohl))
+- Refs [\#33956](https://projects.theforeman.org/issues/33956) - make it easier to toggle asset proxying [\#1085](https://github.com/theforeman/puppet-foreman/pull/1085) ([evgeni](https://github.com/evgeni))
+- Refs [\#35473](https://projects.theforeman.org/issues/35473) - Configure Apache for API extlogin [\#1083](https://github.com/theforeman/puppet-foreman/pull/1083) ([ofedoren](https://github.com/ofedoren))
+
+**Fixed bugs:**
+
+- Convert per\_page in foreman::foreman to string [\#1089](https://github.com/theforeman/puppet-foreman/pull/1089) ([ekohl](https://github.com/ekohl))
+
+**Merged pull requests:**
+
+- Puppet-lint fixes [\#1092](https://github.com/theforeman/puppet-foreman/pull/1092) ([ekohl](https://github.com/ekohl))
+
+## [21.2.0](https://github.com/theforeman/puppet-foreman/tree/21.2.0) (2022-09-20)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/21.1.0...21.2.0)
+
+**Implemented enhancements:**
+
+- puppetlabs/apt: Allow 9.x [\#1082](https://github.com/theforeman/puppet-foreman/pull/1082) ([bastelfreak](https://github.com/bastelfreak))
+
+## [21.1.0](https://github.com/theforeman/puppet-foreman/tree/21.1.0) (2022-08-26)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/21.0.0...21.1.0)
+
+**Implemented enhancements:**
+
+- Add hammer plugin for ssh [\#1076](https://github.com/theforeman/puppet-foreman/pull/1076) ([dgoetz](https://github.com/dgoetz))
+- Allow puppetlabs/apache 8.x [\#1075](https://github.com/theforeman/puppet-foreman/pull/1075) ([ekohl](https://github.com/ekohl))
+- Fixes [\#35356](https://projects.theforeman.org/issues/35356) - Don't proxy /server-status [\#1074](https://github.com/theforeman/puppet-foreman/pull/1074) ([ekohl](https://github.com/ekohl))
+
+## [21.0.0](https://github.com/theforeman/puppet-foreman/tree/21.0.0) (2022-08-04)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/20.2.0...21.0.0)
+
+**Breaking changes:**
+
+- remove support for Debian 10 buster [\#1068](https://github.com/theforeman/puppet-foreman/pull/1068) ([evgeni](https://github.com/evgeni))
+- Stop accepting UNSET as a value and rewrite db.yml to EPP [\#1066](https://github.com/theforeman/puppet-foreman/pull/1066) ([ekohl](https://github.com/ekohl))
+- Drop EL7 support [\#1061](https://github.com/theforeman/puppet-foreman/pull/1061) ([ehelms](https://github.com/ehelms))
+- Fixes [\#34977](https://projects.theforeman.org/issues/34977): Drop apipie\_dsl:cache generation [\#1056](https://github.com/theforeman/puppet-foreman/pull/1056) ([ehelms](https://github.com/ehelms))
+
+**Implemented enhancements:**
+
+- Use Integer type for vhost ssl\_verify\_depth [\#1071](https://github.com/theforeman/puppet-foreman/pull/1071) ([wbclark](https://github.com/wbclark))
+- Update to voxpupuli-test 5 [\#1063](https://github.com/theforeman/puppet-foreman/pull/1063) ([ekohl](https://github.com/ekohl))
+- Add foreman plugin for netbox [\#1060](https://github.com/theforeman/puppet-foreman/pull/1060) ([dgoetz](https://github.com/dgoetz))
+- Add foreman plugin for git\_templates [\#1059](https://github.com/theforeman/puppet-foreman/pull/1059) ([dgoetz](https://github.com/dgoetz))
+- Add foreman plugin for vault [\#1058](https://github.com/theforeman/puppet-foreman/pull/1058) ([dgoetz](https://github.com/dgoetz))
+- Add foreman plugin for scc\_manager [\#1057](https://github.com/theforeman/puppet-foreman/pull/1057) ([dgoetz](https://github.com/dgoetz))
+- Replace template with to\_symbolized\_yaml function [\#1017](https://github.com/theforeman/puppet-foreman/pull/1017) ([ekohl](https://github.com/ekohl))
+- Move static parameters to init.pp [\#978](https://github.com/theforeman/puppet-foreman/pull/978) ([ekohl](https://github.com/ekohl))
+
+**Fixed bugs:**
+
+- Fixes [\#35089](https://projects.theforeman.org/issues/35089) - set NoDelay=false when deploying a UNIX socket [\#1062](https://github.com/theforeman/puppet-foreman/pull/1062) ([evgeni](https://github.com/evgeni))
+
+## [20.2.0](https://github.com/theforeman/puppet-foreman/tree/20.2.0) (2022-06-21)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/20.1.0...20.2.0)
+
+**Implemented enhancements:**
+
+- add foreman\_global\_parameter type [\#1054](https://github.com/theforeman/puppet-foreman/pull/1054) ([jhoblitt](https://github.com/jhoblitt))
+- derive base\_url from foreman-proxy/settings.yml by default [\#1053](https://github.com/theforeman/puppet-foreman/pull/1053) ([jhoblitt](https://github.com/jhoblitt))
+
+## [20.1.0](https://github.com/theforeman/puppet-foreman/tree/20.1.0) (2022-05-24)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/20.0.0...20.1.0)
+
+**Implemented enhancements:**
+
+- use instance debug instead of Puppet.debug [\#1052](https://github.com/theforeman/puppet-foreman/pull/1052) ([jhoblitt](https://github.com/jhoblitt))
+- Fixes [\#34943](https://projects.theforeman.org/issues/34943): Allow configuration of additional cockpit origins [\#1051](https://github.com/theforeman/puppet-foreman/pull/1051) ([ehelms](https://github.com/ehelms))
+- Fixes [\#34602](https://projects.theforeman.org/issues/34602) - restart services after plugin installation [\#1046](https://github.com/theforeman/puppet-foreman/pull/1046) ([evgeni](https://github.com/evgeni))
+
+## [20.0.0](https://github.com/theforeman/puppet-foreman/tree/20.0.0) (2022-04-29)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/19.3.0...20.0.0)
+
+**Breaking changes:**
+
+- Fixes [\#34640](https://projects.theforeman.org/issues/34640) - Drop apipie:cache:index [\#1042](https://github.com/theforeman/puppet-foreman/pull/1042) ([ehelms](https://github.com/ehelms))
+
+**Implemented enhancements:**
+
+- Add Foreman Google plugin [\#1040](https://github.com/theforeman/puppet-foreman/pull/1040) ([stejskalleos](https://github.com/stejskalleos))
+
+**Fixed bugs:**
+
+- Fixes [\#34824](https://projects.theforeman.org/issues/34824) - properly restart foreman when puma config changed [\#1045](https://github.com/theforeman/puppet-foreman/pull/1045) ([evgeni](https://github.com/evgeni))
+
+## [19.3.0](https://github.com/theforeman/puppet-foreman/tree/19.3.0) (2022-04-08)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/19.2.1...19.3.0)
+
+**Implemented enhancements:**
+
+- Include apache::mod::env [\#1038](https://github.com/theforeman/puppet-foreman/pull/1038) ([wbclark](https://github.com/wbclark))
+- Allow puppetlabs/postgresql 8.x [\#1031](https://github.com/theforeman/puppet-foreman/pull/1031) ([ekohl](https://github.com/ekohl))
+- Refs [\#34505](https://projects.theforeman.org/issues/34505) - Add hammer plugin for foreman\_host\_reports [\#1030](https://github.com/theforeman/puppet-foreman/pull/1030) ([ofedoren](https://github.com/ofedoren))
+
+**Fixed bugs:**
+
+- metadata.json: Use https URL to git repo [\#1036](https://github.com/theforeman/puppet-foreman/pull/1036) ([bastelfreak](https://github.com/bastelfreak))
+- Use the new GPG key for Debian packages [\#1034](https://github.com/theforeman/puppet-foreman/pull/1034) ([ekohl](https://github.com/ekohl))
+
+## [19.2.1](https://github.com/theforeman/puppet-foreman/tree/19.2.1) (2022-02-21)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/19.2.0...19.2.1)
+
+**Fixed bugs:**
+
+- Refs [\#34394](https://projects.theforeman.org/issues/34394) - trigger dynflow restart when DB restarts [\#1028](https://github.com/theforeman/puppet-foreman/pull/1028) ([evgeni](https://github.com/evgeni))
+
+## [19.2.0](https://github.com/theforeman/puppet-foreman/tree/19.2.0) (2022-02-04)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/19.1.1...19.2.0)
+
+**Implemented enhancements:**
+
+- puppet/extlib: Allow 6.x [\#1027](https://github.com/theforeman/puppet-foreman/pull/1027) ([bastelfreak](https://github.com/bastelfreak))
+- Reflect Foreman 3.2+ support for Debian 11 [\#1025](https://github.com/theforeman/puppet-foreman/pull/1025) ([ekohl](https://github.com/ekohl))
+- Explicitly enable the foreman dnf module on Foreman 3.2+ [\#1023](https://github.com/theforeman/puppet-foreman/pull/1023) ([evgeni](https://github.com/evgeni))
+- Introduce foreman::settings\_fragment [\#1016](https://github.com/theforeman/puppet-foreman/pull/1016) ([ekohl](https://github.com/ekohl))
+
+## [19.1.1](https://github.com/theforeman/puppet-foreman/tree/19.1.1) (2022-01-26)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/19.1.0...19.1.1)
+
+**Fixed bugs:**
+
+- Fixes [\#34317](https://projects.theforeman.org/issues/34317) - Use the correct certificate to register [\#1022](https://github.com/theforeman/puppet-foreman/pull/1022) ([ekohl](https://github.com/ekohl))
+
+## [19.1.0](https://github.com/theforeman/puppet-foreman/tree/19.1.0) (2022-01-25)
+
+[Full Changelog](https://github.com/theforeman/puppet-foreman/compare/19.0.0...19.1.0)
+
+**Implemented enhancements:**
+
+- Fixes [\#34089](https://projects.theforeman.org/issues/34089) - Add trusted proxies setting [\#1011](https://github.com/theforeman/puppet-foreman/pull/1011) ([sbernhard](https://github.com/sbernhard))
+- puppetlabs/apache: Allow 7.x [\#1006](https://github.com/theforeman/puppet-foreman/pull/1006) ([bastelfreak](https://github.com/bastelfreak))
+- puppetlabs/stdlib: Allow 8.x [\#1004](https://github.com/theforeman/puppet-foreman/pull/1004) ([bastelfreak](https://github.com/bastelfreak))
+- Add basic `foreman_hostgroup` type [\#1002](https://github.com/theforeman/puppet-foreman/pull/1002) ([alexjfisher](https://github.com/alexjfisher))
+
+**Fixed bugs:**
+
+- Fixes [\#34308](https://projects.theforeman.org/issues/34308) - Explicitly notify db:seed from db:migrate [\#1020](https://github.com/theforeman/puppet-foreman/pull/1020) ([ekohl](https://github.com/ekohl))
+- foreman::repo: use the package resource 'ensure' parameter to specify the desired ruby stream [\#1015](https://github.com/theforeman/puppet-foreman/pull/1015) ([bastelfreak](https://github.com/bastelfreak))
+- Fixes [\#34161](https://projects.theforeman.org/issues/34161) - Run apipie:cache:index after db:migrate [\#1010](https://github.com/theforeman/puppet-foreman/pull/1010) ([ekohl](https://github.com/ekohl))
+- Fix lack of idempotency in foreman\_smartproxy\_host provider [\#1009](https://github.com/theforeman/puppet-foreman/pull/1009) ([ehelms](https://github.com/ehelms))
+- Fixes [\#33973](https://projects.theforeman.org/issues/33973) - Restart foreman.service when configuration changes [\#1008](https://github.com/theforeman/puppet-foreman/pull/1008) ([wbclark](https://github.com/wbclark))
+
+**Merged pull requests:**
+
+- Refs [\#34089](https://projects.theforeman.org/issues/34089) - Work around Kafo type parsing bug [\#1013](https://github.com/theforeman/puppet-foreman/pull/1013) ([ekohl](https://github.com/ekohl))
+
 ## [19.0.0](https://github.com/theforeman/puppet-foreman/tree/19.0.0) (2021-11-09)
 
 [Full Changelog](https://github.com/theforeman/puppet-foreman/compare/18.2.0...19.0.0)
@@ -7,6 +316,7 @@
 **Breaking changes:**
 
 - Drop server\_ssl\_certs\_dir parameter [\#1003](https://github.com/theforeman/puppet-foreman/pull/1003) ([ekohl](https://github.com/ekohl))
+- Add Ubuntu 20.04 support & drop Ubuntu 18.04 [\#981](https://github.com/theforeman/puppet-foreman/pull/981) ([ekohl](https://github.com/ekohl))
 - Fixes [\#33789](https://projects.theforeman.org/issues/33789) - Mark host where the installer is running as foreman [\#965](https://github.com/theforeman/puppet-foreman/pull/965) ([adamruzicka](https://github.com/adamruzicka))
 
 **Implemented enhancements:**
@@ -14,7 +324,6 @@
 - Refs [\#33760](https://projects.theforeman.org/issues/33760) - Add host\_reports plugin [\#1000](https://github.com/theforeman/puppet-foreman/pull/1000) ([ofedoren](https://github.com/ofedoren))
 - Switch to puppet/systemd [\#997](https://github.com/theforeman/puppet-foreman/pull/997) ([jovandeginste](https://github.com/jovandeginste))
 - Apply version restrictions to all packages [\#996](https://github.com/theforeman/puppet-foreman/pull/996) ([nbarrientos](https://github.com/nbarrientos))
-- Add Ubuntu 20.04 support & drop Ubuntu 18.04 [\#981](https://github.com/theforeman/puppet-foreman/pull/981) ([ekohl](https://github.com/ekohl))
 
 **Fixed bugs:**
 

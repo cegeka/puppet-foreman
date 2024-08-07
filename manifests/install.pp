@@ -1,6 +1,5 @@
 # Install the needed packages for foreman
 class foreman::install {
-
   package { 'foreman-postgresql':
     ensure => $foreman::version,
   }
@@ -8,13 +7,6 @@ class foreman::install {
   if $facts['os']['selinux']['enabled'] {
     package { 'foreman-selinux':
       ensure => $foreman::version,
-    }
-  }
-
-  # Foreman 2.5 dropped support for Passenger. On EL7 there was a native package built for SCL that should be absent.
-  if $foreman::passenger_ruby_package {
-    package { $foreman::passenger_ruby_package:
-      ensure => absent,
     }
   }
 

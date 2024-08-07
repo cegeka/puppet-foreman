@@ -62,7 +62,7 @@ Puppet::Functions.create_function(:'foreman::foreman') do
     raise Puppet::ParseError, "Foreman: Invalid filter_result: #{filter_result}, must not be boolean true" if filter_result == true
 
     begin
-      path = "/api/#{CGI.escape(item)}?search=#{CGI.escape(search)}&per_page=#{CGI.escape(per_page)}"
+      path = "/api/#{CGI.escape(item)}?search=#{CGI.escape(search)}&per_page=#{CGI.escape(per_page.to_s)}"
 
       req = Net::HTTP::Get.new(path)
       req['Content-Type'] = 'application/json'
@@ -71,7 +71,7 @@ Puppet::Functions.create_function(:'foreman::foreman') do
       if use_tfmproxy
         configfile = '/etc/foreman-proxy/settings.yml'
         configfile = use_tfmproxy if use_tfmproxy.is_a? String
-        raise Puppet::ParseError, "File #{configfile} not found while use_tfmproxy is enabled" unless File.exists?(configfile)
+        raise Puppet::ParseError, "File #{configfile} not found while use_tfmproxy is enabled" unless File.exist?(configfile)
         tfmproxy = YAML.load(File.read(configfile))
         uri = URI.parse(tfmproxy[:foreman_url])
         http = Net::HTTP.new(uri.host, uri.port)
@@ -87,7 +87,7 @@ Puppet::Functions.create_function(:'foreman::foreman') do
         http.use_ssl = true if uri.scheme == 'https'
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if http.use_ssl?
       end
-      results = Timeout::timeout(timeout) { PSON.parse http.request(req).body }
+      results = Timeout::timeout(timeout) { JSON.parse http.request(req).body }
     rescue Exception => e
       raise Puppet::ParseError, "Failed to contact Foreman at #{foreman_url}: #{e}"
     end

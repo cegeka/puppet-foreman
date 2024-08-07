@@ -20,29 +20,70 @@ class foreman::config {
     }
   }
 
+  if $foreman::rails_cache_store['type'] == 'redis' {
+    if $foreman::rails_cache_store['urls'] {
+      $redis_cache_urls = prefix($foreman::rails_cache_store['urls'], 'redis://')
+    } else {
+      include redis
+      $redis_cache_urls = ["redis://localhost:${redis::port}/4"]
+    }
+  } else {
+    $redis_cache_urls =  undef
+  }
+
   # Used in the settings template
   $websockets_ssl_cert = pick($foreman::websockets_ssl_cert, $foreman::server_ssl_cert)
   $websockets_ssl_key = pick($foreman::websockets_ssl_key, $foreman::server_ssl_key)
 
-  concat::fragment {'foreman_settings+01-header.yaml':
-    target  => '/etc/foreman/settings.yaml',
+  if $foreman::logging_layout {
+    $logging_layout = $foreman::logging_layout
+  } elsif $foreman::logging_type == 'journald' {
+    $logging_layout = 'pattern'
+  } else {
+    $logging_layout = 'multiline_request_pattern'
+  }
+
+  foreman::settings_fragment { 'header.yaml':
+    content => template('foreman/_header.erb'),
+    order   => '00',
+  }
+
+  foreman::settings_fragment { 'base.yaml':
     content => template('foreman/settings.yaml.erb'),
     order   => '01',
   }
 
-  concat {'/etc/foreman/settings.yaml':
+  concat { '/etc/foreman/settings.yaml':
     owner => 'root',
     group => $foreman::group,
     mode  => '0640',
   }
 
-  $db_pool = max($foreman::db_pool, $foreman::foreman_service_puma_threads_max)
+  $db_context = {
+    'managed'   => $foreman::db_manage,
+    'rails_env' => $foreman::rails_env,
+    'host'      => $foreman::db_host,
+    'port'      => $foreman::db_port,
+    'sslmode'   => $foreman::db_sslmode_real,
+    'database'  => $foreman::db_database,
+    'username'  => $foreman::db_username,
+    'password'  => $foreman::db_password,
+    # Set the pool size to at least the amount of puma threads + 4 threads that are spawned automatically by the process.
+    # db_pool is optional, and undef means "use default" and the second part of the max statement will be set.
+    # The number 4 is for 4 threads that are spawned internally during the execution:
+    # 1. Katello event daemon listener
+    # 2. Katello event monitor poller
+    # 3. Stomp listener (required by Katello)
+    # 4. Puma server listener thread
+    # This means for systems without Katello we can reduce the amount of the pool to puma_threads_max + 1
+    'db_pool'   => pick($foreman::db_pool, $foreman::foreman_service_puma_threads_max + 4),
+  }
 
   file { '/etc/foreman/database.yml':
     owner   => 'root',
     group   => $foreman::group,
     mode    => '0640',
-    content => template('foreman/database.yml.erb'),
+    content => epp('foreman/database.yml.epp', $db_context),
   }
 
   # CPU based calculation is based on https://github.com/puma/puma/blob/master/docs/deployment.md#mri
@@ -181,6 +222,8 @@ class foreman::config {
         mode   => '0600',
       }
 
+      $gssapi_local_name = bool2str($foreman::gssapi_local_name, 'On', 'Off')
+
       foreman::config::apache::fragment { 'intercept_form_submit':
         ssl_content => template('foreman/intercept_form_submit.conf.erb'),
       }
@@ -193,6 +236,9 @@ class foreman::config {
         ssl_content => template('foreman/auth_gssapi.conf.erb'),
       }
 
+      foreman::config::apache::fragment { 'external_auth_api':
+        ssl_content => template('foreman/external_auth_api.conf.erb'),
+      }
 
       if $foreman::ipa_manage_sssd {
         $sssd = pick(fact('foreman_sssd'), {})
@@ -200,24 +246,34 @@ class foreman::config {
         $sssd_ldap_user_extra_attrs = join(unique(pick($sssd['ldap_user_extra_attrs'], []) + ['email:mail', 'lastname:sn', 'firstname:givenname']), ', ')
         $sssd_allowed_uids = join(unique(pick($sssd['allowed_uids'], []) + [$apache::user, 'root']), ', ')
         $sssd_user_attributes = join(unique(pick($sssd['user_attributes'], []) + ['+email', '+firstname', '+lastname']), ', ')
+        $sssd_ifp_extra_attributes = [
+          "set target[.=~regexp('domain/.*')]/ldap_user_extra_attrs '${sssd_ldap_user_extra_attrs}'",
+          "set target[.='sssd']/services '${sssd_services}'",
+          'set target[.=\'ifp\'] \'ifp\'',
+          "set target[.='ifp']/allowed_uids '${sssd_allowed_uids}'",
+          "set target[.='ifp']/user_attributes '${sssd_user_attributes}'",
+        ]
+
+        $sssd_changes = $sssd_ifp_extra_attributes + ($foreman::ipa_sssd_default_realm ? {
+            undef => [],
+            default => ["set target[.='sssd']/default_domain_suffix '${$foreman::ipa_sssd_default_realm}'"],
+        })
 
         augeas { 'sssd-ifp-extra-attributes':
           context => '/files/etc/sssd/sssd.conf',
-          changes => [
-            "set target[.=~regexp('domain/.*')]/ldap_user_extra_attrs '${sssd_ldap_user_extra_attrs}'",
-            "set target[.='sssd']/services '${sssd_services}'",
-            'set target[.=\'ifp\'] \'ifp\'',
-            "set target[.='ifp']/allowed_uids '${sssd_allowed_uids}'",
-            "set target[.='ifp']/user_attributes '${sssd_user_attributes}'",
-          ],
+          changes => $sssd_changes,
           notify  => Service['sssd'],
         }
       }
 
-      concat::fragment {'foreman_settings+02-authorize_login_delegation.yaml':
-        target  => '/etc/foreman/settings.yaml',
+      foreman::settings_fragment { 'authorize_login_delegation.yaml':
         content => template('foreman/settings-external-auth.yaml.erb'),
         order   => '02',
+      }
+
+      foreman::settings_fragment { 'authorize_login_delegation_api.yaml':
+        content => template('foreman/settings-external-auth-api.yaml.erb'),
+        order   => '03',
       }
     }
   } else {

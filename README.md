@@ -40,7 +40,7 @@ module using the parameter `rails_cache_store`. The parameter takes a hash
 containing the type and options specfic to the backend.
 
 The default is the file backend, configured via `{'type' => 'file'}`. To
-setup for redis use a hash similar to `{'type' => 'redis', 'urls' => ['localhost:8479/0'], 'options' => {'compress' => 'true', 'namespace' => 'foreman'}}`
+setup for redis use a hash similar to `{'type' => 'redis', 'urls' => ['localhost:8479/4'], 'options' => {'compress' => 'true', 'namespace' => 'foreman'}}`
 where `urls` takes an array of redis urls which get prepended with `redis://`
 and `options` using a hash with options from [rails](https://guides.rubyonrails.org/caching_with_rails.html#activesupport-cache-store)
 falling back to `{'compress' => 'true', 'namespace' => 'foreman'}` if no
@@ -53,7 +53,7 @@ could look like this:
 class { 'foreman':
   rails_cache_store => {
     'type' => 'redis',
-    'urls' => ['localhost:8479/0'],
+    'urls' => ['localhost:8479/4'],
     'options' => {
       'compress' => 'true',
       'namespace' => 'foreman'
@@ -75,7 +75,15 @@ previous stable release.
 ### Foreman version compatibility notes
 
 This module targets Foreman 3.1+.
-The module can be used with Foreman 2.4+ by setting `register_in_foreman => false`.
+The module can not be used to manage Foreman installations on EL7.
+
+This module configures Apache to serve static assets from
+`/var/lib/foreman/public` directly. This requires an appropriate
+SELinux policy, like the one introduced in [`foreman-selinux`
+version 3.5](https://projects.theforeman.org/issues/35402).
+Additionally, some plugin packages might be incomplatible with such
+a deployment. To serve assets via Rails again, set
+`foreman::config::apache::proxy_assets` to `true`.
 
 ## Types and providers
 

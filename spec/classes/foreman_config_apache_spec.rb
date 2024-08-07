@@ -18,6 +18,8 @@ describe 'foreman::config::apache' do
       it { should compile.with_all_deps }
 
       it 'should include apache with modules' do
+        should contain_class('apache::mod::env')
+        should contain_apache__mod('expires')
         should contain_class('apache::mod::proxy')
         should contain_class('apache::mod::proxy_http')
         should contain_class('apache::mod::proxy_wstunnel')
@@ -61,7 +63,7 @@ describe 'foreman::config::apache' do
             'unset REMOTE_USER_GROUPS'
           ])
           .with_proxy_pass(
-            "no_proxy_uris" => ['/pulp', '/pulp2', '/streamer', '/pub', '/icons'],
+            "no_proxy_uris" => ['/pulp', '/pub', '/icons', '/images', '/server-status', '/webpack', '/assets'],
             "path"          => '/',
             "url"           => 'unix:///run/foreman.sock|http://foreman/',
             "params"        => { "retry" => '0' },
@@ -77,6 +79,26 @@ describe 'foreman::config::apache' do
 
       it 'does not configure the HTTPS vhost' do
         should_not contain_apache__vhost('foreman-ssl')
+      end
+
+      describe 'with $apache::default_mods set to false' do
+        let(:pre_condition) do
+          <<~PUPPET
+          class { 'apache':
+            default_mods => false,
+          }
+          PUPPET
+        end
+
+        it { should compile.with_all_deps }
+        it 'includes apache modules' do
+          should contain_class('apache::mod::env')
+          should contain_apache__mod('expires')
+          should contain_class('apache::mod::proxy')
+          should contain_class('apache::mod::proxy_http')
+          should contain_class('apache::mod::proxy_wstunnel')
+          should contain_class('apache::mod::rewrite')
+        end
       end
 
       describe 'with keycloak' do
@@ -102,6 +124,23 @@ describe 'foreman::config::apache' do
               'set SSL_CLIENT_VERIFY ""',
               'unset OIDC_FOO',
             ])
+        }
+      end
+
+      describe 'with asset proxying enabled' do
+        let(:params) do
+          super().merge(
+            proxy_assets: true
+          )
+        end
+
+        it { should contain_apache__vhost('foreman')
+            .with_proxy_pass(
+              "no_proxy_uris" => ['/pulp', '/pub', '/icons', '/images', '/server-status'],
+              "path"          => '/',
+              "url"           => 'unix:///run/foreman.sock|http://foreman/',
+              "params"        => { "retry" => '0' },
+            )
         }
       end
 
@@ -161,7 +200,7 @@ describe 'foreman::config::apache' do
             ])
             .with_ssl_proxyengine(true)
             .with_proxy_pass(
-              "no_proxy_uris" => ['/pulp', '/pulp2', '/streamer', '/pub', '/icons'],
+              "no_proxy_uris" => ['/pulp', '/pub', '/icons', '/images', '/server-status', '/webpack', '/assets'],
               "path"          => '/',
               "url"           => 'unix:///run/foreman.sock|http://foreman/',
               "params"        => { "retry" => '0' },

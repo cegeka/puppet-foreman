@@ -1,8 +1,3 @@
-<% @header = ''
-   ERB.new(File.read(File.expand_path("_header.erb",File.dirname(file))), nil, nil, "@header").result(binding) -%>
----
-<%= @header -%>
-
 :unattended: <%= scope.lookupvar("foreman::unattended") %>
 <% unless [nil, :undefined, :undef].include?(scope.lookupvar("foreman::unattended_url")) -%>
 :unattended_url: <%= scope.lookupvar("foreman::unattended_url") %>
@@ -34,7 +29,7 @@
   :level: <%= scope.lookupvar("foreman::logging_level") %>
   :production:
     :type: <%= scope.lookupvar("foreman::logging_type") %>
-    :layout: <%= scope.lookupvar("foreman::logging_layout") %>
+    :layout: <%= @logging_layout %>
 
 <% unless scope.lookupvar('foreman::cors_domains').empty? -%>
 # List of domains allowed for Cross-Origin Resource Sharing
@@ -85,10 +80,10 @@
 
 # Email settings
 <% if scope.lookupvar("foreman::email_sendmail_location") -%>
-:email_sendmail_location: "<%= scope.lookupvar("foreman::email_sendmail_location") %>"
+:sendmail_location: "<%= scope.lookupvar("foreman::email_sendmail_location") %>"
 <% end -%>
 <% if scope.lookupvar("foreman::email_sendmail_arguments") -%>
-:email_sendmail_arguments: "<%= scope.lookupvar("foreman::email_sendmail_arguments") %>"
+:sendmail_arguments: "<%= scope.lookupvar("foreman::email_sendmail_arguments") %>"
 <% end -%>
 <% end -%>
 
@@ -101,12 +96,8 @@
   :type: <%= scope["foreman::rails_cache_store"]["type"] %>
 <% if scope["foreman::rails_cache_store"]["type"] == "redis" -%>
   :urls:
-<%   if scope["foreman::rails_cache_store"].key?("urls") -%>
-<%     scope["foreman::rails_cache_store"]["urls"].each do |url| -%>
-    - redis://<%= url %>
-<%     end -%>
-<%   else -%>
-    - redis://localhost:8479/0
+<%   @redis_cache_urls.each do |url| -%>
+    - <%= url %>
 <%   end -%>
   :options:
 <%   if scope["foreman::rails_cache_store"].key?("options") -%>
@@ -117,4 +108,12 @@
     :compress: true
     :namespace: foreman
 <%   end -%>
+<% end -%>
+<% if scope.lookupvar("foreman::provisioning_ct_location") -%>
+
+:ct_location: "<%= scope.lookupvar("foreman::provisioning_ct_location") %>"
+<% end -%>
+<% if scope.lookupvar("foreman::provisioning_fcct_location") -%>
+
+:fcct_location: "<%= scope.lookupvar("foreman::provisioning_fcct_location") %>"
 <% end -%>
